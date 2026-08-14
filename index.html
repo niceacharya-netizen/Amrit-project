@@ -1,1661 +1,291 @@
-```html
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediAI – AI Doctor Consultation Assistant</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            dark: '#090D16',
-                            card: '#131A2C',
-                            border: '#242F48',
-                            accent: '#10B981', // Neon Emerald
-                            accentHover: '#059669',
-                            blue: '#3B82F6',
-                            red: '#EF4444',
-                            yellow: '#F59E0B'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #090D16;
-            color: #F3F4F6;
-            overflow-x: hidden;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090D16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #242F48;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #10B981;
-        }
-        /* Glassmorphism & High Contrast Borders */
-        .glass-card {
-            background: rgba(19, 26, 44, 0.75);
-            backdrop-filter: blur(12px);
-            border: 2px solid #242F48;
-            box-shadow: 6px 6px 0px 0px rgba(16, 185, 129, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover {
-            border-color: #10B981;
-            box-shadow: 6px 6px 0px 0px rgba(16, 185, 129, 0.3);
-            transform: translate(-2px, -2px);
-        }
-        .interactive-btn {
-            transition: all 0.2s ease-in-out;
-            box-shadow: 4px 4px 0px 0px #090D16;
-        }
-        .interactive-btn:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px 0px #10B981;
-        }
-        .text-glow {
-            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CivicVoice – AI Public Complaint Assistant</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;--panel:#ffffff;--panel2:#eef4ff;--text:#10213c;--muted:#62718a;
+      --line:#dce5f2;--blue:#1267f3;--blue2:#0848c9;--cyan:#22c8f6;--green:#13b87e;
+      --orange:#f79d1e;--red:#ed5454;--purple:#7e5bef;--shadow:0 18px 45px rgba(27,54,104,.11);
+      --radius:20px;
+    }
+    body.dark{
+      --bg:#0b1425;--panel:#111e33;--panel2:#172945;--text:#f2f7ff;--muted:#9caec9;
+      --line:#263c5d;--blue:#4590ff;--blue2:#2472ee;--cyan:#42d4ff;--shadow:0 18px 45px rgba(0,0,0,.3);
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:.25s background,.25s color}
+    button,input,select,textarea{font:inherit} button{cursor:pointer;border:0} a{text-decoration:none;color:inherit}
+    .app{min-height:100vh;display:flex}
+    .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--line);padding:25px 16px;position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column;transition:.25s transform}
+    .brand{display:flex;align-items:center;gap:10px;padding:0 10px 29px;font-weight:900;font-size:22px;letter-spacing:-1px}
+    .brand-mark{width:37px;height:37px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:white;display:grid;place-items:center;font-size:20px;box-shadow:0 8px 17px rgba(18,103,243,.3)}
+    .brand em{font-style:normal;color:var(--blue)}
+    .nav-label{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1.1px;padding:6px 12px 10px;text-transform:uppercase}
+    .nav-item{width:100%;display:flex;align-items:center;gap:13px;padding:12px 13px;border-radius:12px;color:var(--muted);background:transparent;text-align:left;font-weight:700;margin-bottom:4px;transition:.18s}
+    .nav-item:hover{background:var(--panel2);color:var(--blue)} .nav-item.active{background:linear-gradient(90deg,var(--blue),#3985ff);color:#fff;box-shadow:0 9px 20px rgba(18,103,243,.22)}
+    .nav-icon{font-size:18px;width:20px;text-align:center}.report-nav{background:#10213c;color:white;margin:18px 4px 22px;width:calc(100% - 8px);padding:13px;border-radius:13px;font-weight:800;box-shadow:0 9px 18px rgba(16,33,60,.18)} body.dark .report-nav{background:#eaf3ff;color:#10213c}
+    .side-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:15px}.mini-profile{display:flex;gap:10px;align-items:center;padding:8px;font-size:12px;font-weight:700}.avatar{width:33px;height:33px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ffb660,#ed6056);color:white;font-weight:900}.mini-profile small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
+    main{width:calc(100% - 260px);margin-left:260px;min-height:100vh}.topbar{height:78px;padding:0 38px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 92%, transparent);position:sticky;top:0;z-index:20;backdrop-filter:blur(14px)}
+    .page-title{font-size:17px;font-weight:850}.page-subtitle{font-size:12px;color:var(--muted);margin-top:3px}.top-actions{display:flex;align-items:center;gap:10px}.icon-btn{width:39px;height:39px;border-radius:12px;color:var(--text);background:var(--panel);border:1px solid var(--line);font-size:17px;position:relative}.icon-btn:hover{border-color:var(--blue);color:var(--blue)}.dot{width:7px;height:7px;background:var(--red);border-radius:50%;position:absolute;right:9px;top:8px;border:1px solid var(--panel)}
+    .content{padding:32px 38px 48px;max-width:1600px;margin:auto}.view{display:none;animation:appear .3s ease}.view.active{display:block}@keyframes appear{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+    h1,h2,h3,p{margin-top:0}h1{font-size:clamp(29px,3vw,42px);letter-spacing:-1.8px;line-height:1.07;margin-bottom:10px}h2{font-size:23px;letter-spacing:-.7px;margin-bottom:5px}h3{font-size:15px;margin-bottom:5px}.muted{color:var(--muted)}.lead{font-size:15px;color:var(--muted);max-width:680px;line-height:1.55}.section-head{display:flex;justify-content:space-between;align-items:end;margin:31px 0 15px}.section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .btn{border-radius:12px;padding:11px 16px;font-size:13px;font-weight:800;transition:.18s;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:active{transform:scale(.97)}.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:white;box-shadow:0 10px 20px rgba(18,103,243,.24)}.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn-secondary{background:var(--panel);color:var(--text);border:1px solid var(--line)}.btn-secondary:hover{border-color:var(--blue);color:var(--blue)}.btn-danger{background:#fff0f0;color:var(--red)}
+    .welcome{border-radius:24px;min-height:205px;padding:32px;position:relative;overflow:hidden;color:white;background:linear-gradient(110deg,#082b68,#1267f3 61%,#12bfea)}.welcome:before{content:"";position:absolute;width:270px;height:270px;border:42px solid rgba(255,255,255,.12);border-radius:50%;right:7%;top:-130px}.welcome:after{content:"";position:absolute;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:34px;transform:rotate(28deg);right:2%;bottom:-105px}.welcome-content{position:relative;z-index:1;max-width:600px}.welcome h1{font-size:clamp(29px,3.4vw,43px);margin-bottom:10px}.welcome p{color:#dbeaff;line-height:1.5;margin-bottom:22px}.white-btn{background:white;color:#0954d5}.white-btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.18)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:18px}.stat-card,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.stat-card{padding:19px;position:relative;overflow:hidden}.stat-card:after{content:"";position:absolute;width:67px;height:67px;border-radius:50%;right:-18px;bottom:-21px;background:var(--tone,#e3efff)}.stat-top{display:flex;justify-content:space-between;align-items:start;color:var(--muted);font-size:12px;font-weight:700}.stat-icon{background:var(--tone,#e3efff);width:34px;height:34px;display:grid;place-items:center;border-radius:10px;font-size:16px}.stat-num{font-size:30px;font-weight:900;letter-spacing:-1.2px;margin:17px 0 4px}.stat-foot{font-size:11px;color:var(--green);font-weight:700}
+    .dash-grid{display:grid;grid-template-columns:1.35fr .8fr;gap:18px}.card{padding:21px}.chart-card{min-height:282px}.chart-bars{height:184px;display:flex;align-items:end;justify-content:space-around;padding:12px 5px 0;border-bottom:1px solid var(--line);margin-top:8px}.bar-group{text-align:center;width:12%;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:8px;font-size:10px;color:var(--muted);font-weight:700}.bar{width:70%;max-width:32px;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--cyan),var(--blue));min-height:10px;transition:height .5s}.process{display:flex;flex-direction:column;gap:0;margin-top:12px}.process-step{display:flex;align-items:center;gap:12px;position:relative;padding-bottom:16px;font-size:13px;font-weight:800}.process-step:not(:last-child):after{content:"";position:absolute;left:15px;top:32px;height:15px;border-left:2px dashed #aac7f6}.process-no{width:31px;height:31px;background:var(--panel2);color:var(--blue);border-radius:10px;display:grid;place-items:center;font-size:13px}
+    .list-card{padding:0;overflow:hidden}.list-row{padding:15px 19px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:13px;transition:.15s;cursor:pointer}.list-row:last-child{border:0}.list-row:hover{background:var(--panel2)}.cat-icon{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;background:var(--tone,#e4efff);font-size:19px;flex:0 0 auto}.row-main{min-width:0;flex:1}.row-title{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row-meta{font-size:11px;color:var(--muted);margin-top:4px}.status,.priority{font-size:10px;font-weight:850;border-radius:20px;padding:5px 8px;white-space:nowrap}.status.submitted{color:#42638e;background:#eaf0f9}.status.review{color:#946400;background:#fff4d9}.status.progress{color:#0b67aa;background:#dcf3ff}.status.resolved{color:#087b56;background:#dbf7eb}.priority.high{color:#bb3232;background:#ffe5e5}.priority.medium{color:#a86b00;background:#fff2d8}.priority.low{color:#2476a0;background:#e1f4ff}
+    .report-layout{max-width:950px;margin:auto}.steps{display:flex;align-items:center;margin:28px 0 22px}.step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted);flex:1}.step:not(:last-child):after{content:"";height:2px;background:var(--line);flex:1;margin:0 12px}.step-badge{height:28px;width:28px;display:grid;place-items:center;border-radius:50%;background:var(--line);color:var(--muted)}.step.on{color:var(--blue)}.step.on .step-badge{background:var(--blue);color:white}.step.done .step-badge{background:var(--green);color:white}
+    .form-card{padding:28px}.form-pane{display:none}.form-pane.active{display:block;animation:appear .25s ease}.dropzone{border:2px dashed #aec8f2;background:var(--panel2);border-radius:18px;min-height:205px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;transition:.2s}.dropzone.drag{border-color:var(--blue);background:#e3efff}.drop-icon{width:51px;height:51px;border-radius:16px;background:var(--blue);color:white;display:grid;place-items:center;font-size:23px;margin-bottom:12px}.dropzone strong{font-size:14px}.dropzone span{font-size:12px;color:var(--muted);margin:6px}.uploaded-preview{max-height:155px;max-width:100%;border-radius:12px;display:none;object-fit:cover;margin-top:12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.field{margin-bottom:17px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px}.field input,.field select,.field textarea,.assistant-input input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);outline:none;border-radius:11px;padding:11px 12px;font-size:13px;transition:.2s}.field input:focus,.field select:focus,.field textarea:focus,.assistant-input input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(18,103,243,.12)}.field textarea{resize:vertical;min-height:116px;line-height:1.5}.voice-row{display:flex;gap:8px}.voice-row input{flex:1}.voice-btn{border-radius:11px;width:45px;background:#e6f0ff;color:var(--blue);font-size:17px}.voice-btn.listening{background:#ffdddd;color:var(--red);animation:pulse 1s infinite}@keyframes pulse{50%{transform:scale(.95);opacity:.7}}.form-actions{border-top:1px solid var(--line);padding-top:19px;margin-top:24px;display:flex;justify-content:space-between}
+    .ai-loading{text-align:center;padding:40px}.ai-orb{width:67px;height:67px;margin:auto auto 15px;border-radius:50%;background:conic-gradient(var(--blue),var(--cyan),var(--purple),var(--blue));animation:spin 1.7s linear infinite;position:relative}.ai-orb:after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--panel)}@keyframes spin{to{transform:rotate(360deg)}}.analysis-box{border:1px solid #bcd5fc;background:linear-gradient(130deg,#edf5ff,transparent);border-radius:16px;padding:18px;margin-bottom:19px}.analysis-title{color:var(--blue);font-weight:900;font-size:13px;margin-bottom:14px}.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.summary-item{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px}.summary-item small{display:block;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:4px}.summary-item b{font-size:13px}.success{text-align:center;padding:24px 5px}.success-mark{width:75px;height:75px;border-radius:50%;display:grid;place-items:center;background:#ddf8eb;color:var(--green);font-size:35px;margin:0 auto 17px}.id-chip{display:inline-block;background:var(--panel2);color:var(--blue);padding:9px 15px;border-radius:9px;font-weight:900;margin:5px 0 18px}
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:17px}.search{position:relative;flex:1;min-width:180px}.search input{width:100%;padding:11px 13px 11px 36px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--text);outline:none;font-size:13px}.search:before{content:"⌕";position:absolute;left:13px;top:7px;font-size:20px;color:var(--muted)}.filter-select{padding:10px 12px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:11px;font-size:12px;outline:none}.complaint-table{overflow:auto}.table-head,.complaint-item{display:grid;grid-template-columns:1.1fr 1.2fr .75fr 1.2fr .85fr .65fr;gap:12px;align-items:center;min-width:760px}.table-head{padding:12px 18px;color:var(--muted);font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.5px;background:var(--panel2)}.complaint-item{padding:15px 18px;border-top:1px solid var(--line);cursor:pointer;font-size:12px}.complaint-item:hover{background:var(--panel2)}.id-text{color:var(--blue);font-weight:900}.empty{text-align:center;padding:55px 15px;color:var(--muted)}.empty b{display:block;color:var(--text);margin:10px}
+    .community-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:20px}.feed-card{padding:0;overflow:hidden}.feed-item{padding:20px;border-bottom:1px solid var(--line)}.feed-top{display:flex;gap:12px}.feed-title{font-size:15px;font-weight:900;cursor:pointer}.feed-title:hover{color:var(--blue)}.feed-desc{font-size:12px;line-height:1.5;color:var(--muted);margin:9px 0 13px}.feed-footer{display:flex;align-items:center;justify-content:space-between}.support-btn{padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--panel);font-size:11px;font-weight:800;color:var(--muted)}.support-btn:hover,.support-btn.active{background:#e8f1ff;color:var(--blue);border-color:#a8c9fc}.community-side{height:max-content}.insight{padding:18px;border-radius:17px;background:linear-gradient(145deg,#112e68,#175ee0);color:white;margin-bottom:16px}.insight p{font-size:12px;line-height:1.5;color:#d8e7ff;margin-bottom:13px}.trend{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:12px 0;font-size:12px;font-weight:800}.trend:last-child{border:0}.trend span:last-child{color:var(--blue)}
+    .map-wrap{padding:0;overflow:hidden}.map-canvas{height:570px;position:relative;overflow:hidden;background-color:#dfeee4;background-image:linear-gradient(25deg,transparent 48%,rgba(255,255,255,.75) 49%,rgba(255,255,255,.75) 52%,transparent 53%),linear-gradient(-47deg,transparent 46%,rgba(255,255,255,.78) 47%,rgba(255,255,255,.78) 50%,transparent 51%),linear-gradient(0deg,transparent 49%,rgba(159,196,177,.35) 50%,transparent 51%);background-size:190px 140px,240px 190px,70px 70px}.map-canvas:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 23% 38%,rgba(91,184,244,.57) 0 4%,transparent 4.3%),radial-gradient(ellipse at 75% 66%,rgba(85,178,109,.22) 0 11%,transparent 11.5%),radial-gradient(ellipse at 70% 20%,rgba(85,178,109,.2) 0 9%,transparent 9.5%)}.map-label{position:absolute;font-size:11px;font-weight:900;letter-spacing:.6px;color:#598070;text-transform:uppercase}.marker{position:absolute;z-index:2;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--marker,var(--blue));color:white;display:grid;place-items:center;box-shadow:0 5px 12px rgba(0,0,0,.25);border:3px solid white;transition:.2s}.marker span{transform:rotate(45deg);font-size:14px}.marker:hover{scale:1.18;z-index:4}.map-popup{position:absolute;background:var(--panel);color:var(--text);z-index:5;width:250px;border-radius:14px;padding:14px;box-shadow:var(--shadow);display:none;border:1px solid var(--line)}.map-popup.on{display:block}.map-popup h3{font-size:13px}.map-controls{position:absolute;z-index:4;right:15px;top:15px;display:flex;flex-direction:column;gap:5px}.map-controls button{width:34px;height:34px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:8px;font-size:19px}
+    .about-hero{padding:45px;border-radius:25px;background:linear-gradient(120deg,#0b265b,#1267f3);color:white;position:relative;overflow:hidden}.about-hero:after{content:"C";position:absolute;right:4%;top:-48px;font-size:260px;font-weight:1000;opacity:.09}.about-hero p{max-width:650px;color:#d8e8ff;line-height:1.6}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature-card{padding:20px}.feature-card .cat-icon{margin-bottom:13px}.feature-card p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}
+    .assistant-toggle{position:fixed;right:27px;bottom:25px;z-index:35;width:57px;height:57px;border-radius:18px;background:linear-gradient(145deg,#1267f3,#7348ed);box-shadow:0 13px 25px rgba(42,75,180,.35);color:white;font-size:25px}.assistant-panel{position:fixed;z-index:36;right:27px;bottom:94px;width:min(370px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:21px;box-shadow:0 24px 65px rgba(13,28,60,.28);overflow:hidden;display:none;animation:appear .25s ease}.assistant-panel.open{display:block}.assistant-header{padding:17px;background:linear-gradient(120deg,#0c347c,#1267f3);color:white;display:flex;justify-content:space-between;align-items:center}.assistant-header small{display:block;color:#cbe0ff;margin-top:3px}.close-x{background:rgba(255,255,255,.15);color:white;border-radius:8px;width:29px;height:29px}.chat{height:285px;padding:15px;overflow:auto;background:var(--bg)}.bubble{max-width:88%;font-size:12px;line-height:1.5;padding:10px 12px;border-radius:13px;margin-bottom:10px}.bubble.bot{background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:3px}.bubble.user{background:var(--blue);color:white;margin-left:auto;border-bottom-right-radius:3px}.structured{font-size:11px;background:#e7f1ff;color:#153b7e;padding:10px;border-radius:10px;margin-top:8px}.assistant-input{padding:11px;border-top:1px solid var(--line);display:flex;gap:7px}.assistant-input input{padding:10px}.assistant-input button{width:40px;border-radius:10px;background:var(--blue);color:white}
+    .modal-backdrop,.confirm-backdrop{position:fixed;inset:0;z-index:50;background:rgba(5,18,41,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px}.modal-backdrop.open,.confirm-backdrop.open{display:flex}.modal{width:min(650px,100%);max-height:88vh;overflow:auto;background:var(--panel);border-radius:21px;box-shadow:0 25px 80px rgba(0,0,0,.3);animation:appear .25s}.modal-head{padding:18px 21px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.modal-body{padding:21px}.detail-photo{height:150px;border-radius:14px;background:linear-gradient(135deg,#83b7f7,#d6ecff);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:18px;overflow:hidden}.detail-photo img{width:100%;height:100%;object-fit:cover}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:18px 0}.detail-grid div{background:var(--bg);padding:11px;border-radius:10px;font-size:12px}.detail-grid small{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;margin-bottom:4px}.timeline{margin:17px 0}.timeline-item{display:flex;gap:12px;min-height:50px;font-size:12px;position:relative}.timeline-item:not(:last-child):after{content:"";position:absolute;left:7px;top:17px;height:30px;border-left:2px solid var(--line)}.time-dot{width:16px;height:16px;border-radius:50%;background:var(--line);z-index:1;flex:0 0 auto}.timeline-item.done .time-dot{background:var(--green);box-shadow:0 0 0 4px #daf7e9}.timeline-item.current .time-dot{background:var(--blue);box-shadow:0 0 0 4px #dceaff}.confirm{width:min(390px,100%);background:var(--panel);border-radius:19px;padding:25px;box-shadow:var(--shadow)}.confirm-actions{display:flex;justify-content:end;gap:9px;margin-top:20px}
+    .notification-panel{position:fixed;right:82px;top:73px;width:min(350px,calc(100vw - 25px));z-index:41;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);display:none;overflow:hidden}.notification-panel.open{display:block;animation:appear .2s}.notif-head{padding:15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;font-weight:900;font-size:13px}.notif{display:flex;gap:10px;padding:14px;border-bottom:1px solid var(--line);font-size:12px;line-height:1.4}.notif:last-child{border:0}.notif-icon{width:29px;height:29px;border-radius:9px;background:#e5efff;display:grid;place-items:center;flex:0 0 auto}.notif small{display:block;color:var(--muted);margin-top:3px}
+    .toast-wrap{position:fixed;z-index:100;right:23px;bottom:24px;display:flex;flex-direction:column;gap:9px}.toast{background:#10213c;color:white;padding:12px 16px;border-radius:12px;box-shadow:0 12px 28px rgba(0,0,0,.22);font-size:12px;font-weight:700;animation:toastin .3s;max-width:330px}.toast.success{border-left:4px solid var(--green)}@keyframes toastin{from{transform:translateX(120%)}to{transform:none}}
+    .mobile-menu{display:none}
+    @media(max-width:1050px){.stats{grid-template-columns:repeat(2,1fr)}.community-layout{grid-template-columns:1fr}.community-side{display:grid;grid-template-columns:1fr 1fr;gap:16px}.insight{margin:0}.feature-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:760px){.sidebar{transform:translateX(-100%);box-shadow:var(--shadow)}.sidebar.open{transform:none}.mobile-menu{display:grid}.sidebar-close{display:block!important;position:absolute;right:11px;top:18px}.topbar{padding:0 16px;height:68px}.topbar .page-subtitle{display:none}.content{padding:23px 16px 40px}main{width:100%;margin-left:0}.top-actions .btn{display:none}.welcome{padding:27px 22px;min-height:230px}.stats{gap:10px}.stat-card{padding:15px}.stat-num{font-size:25px}.dash-grid{grid-template-columns:1fr}.chart-card{min-height:250px}.step{font-size:0;flex:auto}.step:not(:last-child):after{width:22px;flex:none;margin:0 6px}.form-card{padding:18px}.form-grid,.summary-grid,.detail-grid{grid-template-columns:1fr}.table-head,.complaint-item{min-width:700px}.community-side{display:block}.community-side .card{margin-top:16px}.feature-grid{grid-template-columns:1fr}.about-hero{padding:30px 24px}.map-canvas{height:500px}.row-meta{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.list-row{padding:13px}.status{display:none}.assistant-toggle{right:17px;bottom:17px}.assistant-panel{right:16px;bottom:84px}.notification-panel{right:14px;top:64px}.mobile-only{display:block!important}}
+  </style>
 </head>
-<body class="min-h-screen flex flex-col">
-
-    <!-- Top Emergency Warning Banner -->
-    <div class="bg-red-950/80 border-b border-red-500/30 text-red-200 py-2.5 px-4 text-sm text-center font-medium sticky top-0 z-50 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto flex justify-between items-center gap-4 flex-wrap">
-            <span class="flex items-center gap-2 mx-auto md:mx-0">
-                <i class="fa-solid fa-triangle-exclamation text-red-500 animate-pulse text-base"></i>
-                <span id="nav-emergency-banner"><strong>Immediate Medical Warning:</strong> If you are experiencing a severe emergency, please contact your local emergency services immediately.</span>
-            </span>
-            <span class="hidden md:inline-block bg-red-900/60 px-2.5 py-0.5 rounded text-xs border border-red-500/40 font-bold uppercase tracking-wide">Emergency Call: 102 (Demo Mode)</span>
-        </div>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <button class="icon-btn sidebar-close" style="display:none" onclick="toggleMenu()">×</button>
+    <div class="brand"><div class="brand-mark">⌁</div>Civic<em>Voice</em></div>
+    <div class="nav-label">Main menu</div>
+    <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span>Dashboard</button>
+    <button class="nav-item" data-page="report"><span class="nav-icon">⊕</span>Report Problem</button>
+    <button class="nav-item" data-page="complaints"><span class="nav-icon">▤</span>My Complaints</button>
+    <button class="nav-item" data-page="community"><span class="nav-icon">◉</span>Community</button>
+    <button class="nav-item" data-page="map"><span class="nav-icon">⌖</span>Map</button>
+    <button class="nav-item" data-page="about"><span class="nav-icon">ⓘ</span>About</button>
+    <button class="report-nav" onclick="goPage('report')">＋ Report a Problem</button>
+    <div class="side-bottom">
+      <button class="nav-item" onclick="toggleTheme()"><span class="nav-icon" id="themeIcon">◐</span><span id="themeText">Dark mode</span></button>
+      <div class="mini-profile"><div class="avatar">AM</div><div>Alex Morgan<small>Citizen account</small></div></div>
     </div>
+  </aside>
 
-    <!-- Main Navigation Header -->
-    <header class="bg-brand-dark/95 border-b border-brand-border sticky top-[45px] z-40 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Brand Logo -->
-            <a href="#" onclick="navigateTo('home')" class="flex items-center gap-3 group">
-                <div class="w-11 h-11 rounded-xl bg-brand-accent flex items-center justify-center text-brand-dark font-extrabold text-xl shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] transition-transform group-hover:scale-105">
-                    <i class="fa-solid fa-user-doctor"></i>
-                </div>
-                <div>
-                    <span class="text-2xl font-black tracking-tight text-white block">Medi<span class="text-brand-accent text-glow">AI</span></span>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase block -mt-1">Class 12 AI Prototype</span>
-                </div>
-            </a>
-
-            <!-- Desktop Nav Links -->
-            <nav class="hidden lg:flex items-center gap-1">
-                <button onclick="navigateTo('home')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">Home</button>
-                <button onclick="navigateTo('consult')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-comment-medical text-brand-accent"></i> AI Consult</button>
-                <button onclick="navigateTo('doctors')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">Find Doctor</button>
-                <button onclick="navigateTo('dashboard')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-brand-accent"></i> Dashboard</button>
-                <button onclick="navigateTo('resources')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">Health Resources</button>
-                <button onclick="navigateTo('about')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">About Project</button>
-            </nav>
-
-            <!-- Action Area (Language Toggle, Dashboard Icon, Call-to-Action) -->
-            <div class="hidden lg:flex items-center gap-4">
-                <!-- Language Switcher Button -->
-                <button onclick="toggleLanguage()" id="lang-switch-btn" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border hover:border-brand-accent px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-language text-base text-brand-accent"></i>
-                    <span>नेपाली / EN</span>
-                </button>
-
-                <!-- Patient Profile Widget -->
-                <button onclick="openPatientProfileModal()" class="w-10 h-10 rounded-full bg-slate-800 border-2 border-brand-border flex items-center justify-center text-slate-300 hover:border-brand-accent transition-colors relative" title="View Patient Profile">
-                    <i class="fa-solid fa-user-astronaut text-base"></i>
-                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-brand-accent border-2 border-brand-dark rounded-full"></span>
-                </button>
-
-                <!-- Start Consult CTA -->
-                <button onclick="navigateTo('consult')" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-5 py-2.5 rounded-xl text-sm transition-all shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
-                    Consult Now
-                </button>
-            </div>
-
-            <!-- Mobile Menu Toggle -->
-            <button onclick="toggleMobileMenu()" class="lg:hidden w-11 h-11 rounded-lg border-2 border-brand-border flex items-center justify-center text-slate-200">
-                <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
-            </button>
-        </div>
-
-        <!-- Mobile Navigation Menu Dropdown -->
-        <div id="mobile-menu" class="hidden lg:hidden border-t border-brand-border bg-brand-dark px-4 py-6 space-y-3">
-            <button onclick="navigateTo('home'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">Home</button>
-            <button onclick="navigateTo('consult'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-comment-medical text-brand-accent mr-2"></i> AI Consultation</button>
-            <button onclick="navigateTo('doctors'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">Find Doctor</button>
-            <button onclick="navigateTo('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-calendar-check text-brand-accent mr-2"></i> Patient Dashboard</button>
-            <button onclick="navigateTo('resources'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">Health Resources</button>
-            <button onclick="navigateTo('about'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">About Project</button>
-            <div class="border-t border-brand-border pt-4 flex items-center justify-between gap-4">
-                <button onclick="toggleLanguage(); toggleMobileMenu()" class="flex-1 bg-brand-card hover:bg-slate-800 border border-brand-border px-3 py-2 rounded-lg text-sm font-bold text-slate-300 text-center">
-                    Switch to नेपाली
-                </button>
-                <button onclick="openPatientProfileModal(); toggleMobileMenu()" class="bg-brand-card hover:bg-slate-800 border border-brand-border p-2 rounded-lg text-slate-300 text-center flex items-center justify-center gap-2 flex-1 text-sm font-bold">
-                    <i class="fa-solid fa-user-astronaut"></i> Profile
-                </button>
-            </div>
-        </div>
+  <main>
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="icon-btn mobile-menu" onclick="toggleMenu()">☰</button>
+        <div><div class="page-title" id="topTitle">Dashboard</div><div class="page-subtitle" id="topSub">Your city, heard and improved.</div></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-primary" onclick="goPage('report')">＋ Report a Problem</button>
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle color mode">◐</button>
+        <button class="icon-btn" onclick="toggleNotifications()" title="Notifications">♧<i class="dot"></i></button>
+        <div class="avatar">AM</div>
+      </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="flex-grow">
-
-        <!-- SECTION: HOME -->
-        <section id="section-home" class="py-12 md:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
-            <!-- Hero Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="inline-flex items-center gap-2.5 bg-brand-accent/10 border-2 border-brand-accent/30 text-brand-accent py-1.5 px-3.5 rounded-full text-xs font-extrabold tracking-wide uppercase">
-                        <span class="w-2.5 h-2.5 bg-brand-accent rounded-full animate-ping"></span>
-                        Nepal's First AI Health Assistant Prototype
-                    </div>
-                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] text-white">
-                        Medi<span class="text-brand-accent text-glow">AI</span> – Intelligent Health Assistant
-                    </h1>
-                    <p class="text-lg md:text-xl text-slate-300 font-medium max-w-2xl leading-relaxed" id="hero-subtitle">
-                        Understand your health concerns, find key informational guides, and seamlessly discover optimal next steps with our next-generation diagnostic assistant framework.
-                    </p>
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-                        <button onclick="navigateTo('consult')" class="interactive-btn bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-8 py-4 rounded-xl text-base text-center transition-all flex items-center justify-center gap-2.5">
-                            <i class="fa-solid fa-notes-medical text-lg"></i>
-                            <span id="hero-btn-primary">Start AI Consultation</span>
-                        </button>
-                        <button onclick="navigateTo('doctors')" class="interactive-btn bg-brand-card hover:bg-slate-850 text-slate-200 border-2 border-brand-border hover:border-brand-accent font-extrabold px-8 py-4 rounded-xl text-base text-center transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <span id="hero-btn-secondary">Find a Demo Doctor</span>
-                        </button>
-                    </div>
-                    <div class="flex items-center gap-4 text-slate-400 text-xs font-semibold pt-4 border-t border-brand-border max-w-xl">
-                        <span class="flex items-center gap-1.5 text-brand-accent">
-                            <i class="fa-solid fa-shield-halved text-sm"></i> Secure Sandbox
-                        </span>
-                        <span>•</span>
-                        <span>Educational Concept Tool</span>
-                        <span>•</span>
-                        <span>No Real Prescriptions</span>
-                    </div>
-                </div>
-                <!-- Interactive Dashboard Hero Card/Art -->
-                <div class="lg:col-span-5 relative">
-                    <div class="absolute -inset-1.5 bg-gradient-to-r from-brand-accent to-brand-blue rounded-3xl blur opacity-30 animate-pulse"></div>
-                    <div class="relative bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-6">
-                        <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-brand-accent/20 rounded-lg flex items-center justify-center text-brand-accent">
-                                    <i class="fa-solid fa-robot text-lg"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-white">MediAI Assistant v2.0</h4>
-                                    <span class="text-[10px] text-brand-accent font-semibold tracking-wider uppercase block">System Active</span>
-                                </div>
-                            </div>
-                            <span class="w-2.5 h-2.5 rounded-full bg-brand-accent animate-pulse"></span>
-                        </div>
-                        <!-- Mini Simulation Visual -->
-                        <div class="space-y-3.5">
-                            <div class="bg-brand-dark/80 p-3.5 rounded-xl border border-brand-border text-xs text-slate-300">
-                                <span class="font-bold text-brand-accent block mb-1">User Symptom Statement</span>
-                                "I have had a mild headache and persistent dry cough for the last three days."
-                            </div>
-                            <div class="bg-brand-accent/5 p-3.5 rounded-xl border border-brand-accent/30 text-xs text-slate-300 relative">
-                                <span class="font-bold text-brand-accent flex items-center gap-1.5 mb-1">
-                                    <i class="fa-solid fa-circle-info"></i> MediAI Educational Analyzer
-                                </span>
-                                "Analyzing timeline & risk vectors. Asking necessary triage queries: Are you experiencing shortness of breath or high fever?"
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between gap-3 bg-brand-dark/60 p-3 rounded-lg border border-brand-border text-xs text-slate-400">
-                            <span>Primary Risk Level Index:</span>
-                            <span class="font-bold text-brand-yellow px-2 py-0.5 bg-brand-yellow/10 rounded border border-brand-yellow/30 uppercase tracking-widest text-[10px]">Moderate</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feature Cards Section -->
-            <div class="space-y-8">
-                <div class="text-center max-w-3xl mx-auto space-y-2">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Key Platform Features</h2>
-                    <p class="text-slate-400 font-medium">Specially architected components detailing how conversational AI supports community primary triage protocols.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Feature 1 -->
-                    <div class="glass-card p-8 rounded-2xl space-y-4">
-                        <div class="w-12 h-12 bg-brand-accent/10 border-2 border-brand-accent/30 text-brand-accent rounded-xl flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_rgba(16,185,129,0.1)]">
-                            <i class="fa-solid fa-brain"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">Interactive AI Consultation</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Simulates expert-level primary triage, gathering details on symptoms, severity, and duration to generate comprehensive baseline health profiles.
-                        </p>
-                    </div>
-                    <!-- Feature 2 -->
-                    <div class="glass-card p-8 rounded-2xl space-y-4">
-                        <div class="w-12 h-12 bg-brand-blue/10 border-2 border-brand-blue/30 text-brand-blue rounded-xl flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_rgba(59,130,246,0.1)]">
-                            <i class="fa-solid fa-user-md"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">Find Demo Doctors</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Filter specialty-vetted clinical profiles across key fields (Pediatrics, Cardiology, General Medicine, Dentistry) to schedule appropriate follow-ups.
-                        </p>
-                    </div>
-                    <!-- Feature 3 -->
-                    <div class="glass-card p-8 rounded-2xl space-y-4">
-                        <div class="w-12 h-12 bg-purple-500/10 border-2 border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_rgba(168,85,247,0.1)]">
-                            <i class="fa-solid fa-clipboard-list"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">Structured Dashboards</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Retrieve medical consultation reports, check real-time booking updates, and review educational symptom breakdowns on a simple layout.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- How It Works Section -->
-            <div class="bg-brand-card/50 border-2 border-brand-border rounded-3xl p-8 md:p-12 space-y-12">
-                <div class="text-center max-w-2xl mx-auto space-y-2">
-                    <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Streamlined AI Workflow</span>
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">How Consultation Assistant Works</h2>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-                    <!-- Step 1 -->
-                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
-                        <span class="text-5xl font-black text-brand-accent/20 block">01</span>
-                        <h4 class="text-lg font-bold text-white">Describe Concern</h4>
-                        <p class="text-xs text-slate-300 leading-relaxed">Input your direct complaints, major localized symptoms, or initial discomfort in the intuitive diagnostic pane.</p>
-                    </div>
-                    <!-- Step 2 -->
-                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
-                        <span class="text-5xl font-black text-brand-blue/20 block">02</span>
-                        <h4 class="text-lg font-bold text-white">Answer AI Diagnostics</h4>
-                        <p class="text-xs text-slate-300 leading-relaxed">Respond to precise follow-up questions from the MediAI chatbot regarding symptom duration, pain profile, and triggers.</p>
-                    </div>
-                    <!-- Step 3 -->
-                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
-                        <span class="text-5xl font-black text-brand-yellow/20 block">03</span>
-                        <h4 class="text-lg font-bold text-white">Acquire General Info</h4>
-                        <p class="text-xs text-slate-300 leading-relaxed">Receive custom summaries, educational reading tracks, and real-time guidance based on your risk stratification metrics.</p>
-                    </div>
-                    <!-- Step 4 -->
-                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
-                        <span class="text-5xl font-black text-red-500/20 block">04</span>
-                        <h4 class="text-lg font-bold text-white">Formulate Action Plan</h4>
-                        <p class="text-xs text-slate-300 leading-relaxed">Identify matched local demographic practitioners, choose available schedules, and safely book instant follow-up visits.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Absolute Medical Disclaimer Banner -->
-            <div class="bg-slate-900 border-2 border-slate-750 p-6 md:p-8 rounded-2xl flex flex-col md:flex-row items-start gap-5">
-                <div class="bg-brand-yellow/10 border-2 border-brand-yellow/40 text-brand-yellow p-3 rounded-xl">
-                    <i class="fa-solid fa-circle-exclamation text-xl"></i>
-                </div>
-                <div class="space-y-2 flex-1">
-                    <h4 class="text-lg font-bold text-white">Critical Prototypic & Clinical Disclaimer</h4>
-                    <p class="text-xs text-slate-300 leading-relaxed">
-                        <strong>MediAI is an educational diagnostic web simulation</strong> created solely for high school demonstration purposes. This system is not engineered, licensed, or configured to prescribe treatments, diagnose conditions, issue prescriptions, or render real-time clinical decisions. Standard medical evaluations require full in-person dynamic evaluation by fully credentialed and licensed health practitioners. <strong>NEVER disregard certified medical expert feedback based on insights acquired here.</strong>
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: AI CONSULTATION (CHAT SCREEN) -->
-        <section id="section-consult" class="hidden py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <!-- Header section of chatbot -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-card border-2 border-brand-border rounded-2xl p-5">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-brand-accent/10 border border-brand-accent text-brand-accent rounded-xl flex items-center justify-center text-2xl relative">
-                        <i class="fa-solid fa-robot"></i>
-                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-brand-card rounded-full"></span>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
-                            MediAI Core Diagnostic Engine
-                            <span class="bg-brand-accent/20 text-brand-accent text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Concept Engine</span>
-                        </h2>
-                        <span class="text-xs text-slate-400">Educational Health triage session simulator</span>
-                    </div>
-                </div>
-                <!-- Dynamic Urgency Meter Display inside Chat -->
-                <div class="flex items-center gap-2.5 bg-brand-dark px-4 py-2.5 rounded-xl border border-brand-border">
-                    <span class="text-xs text-slate-400 font-bold">Urgency Index:</span>
-                    <div id="urgency-pill-display" class="bg-slate-800 border border-slate-700 text-slate-300 px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider">
-                        Awaiting Inputs
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Chat Grid (Left Sidebar with Quick Inputs, Right Chat Sandbox) -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-[550px] md:h-[650px] items-stretch">
-                <!-- Left Sidebar: Patient Quick-Start presets -->
-                <div class="md:col-span-4 bg-brand-card border-2 border-brand-border rounded-2xl p-5 flex flex-col justify-between space-y-4">
-                    <div class="space-y-4">
-                        <h4 class="text-xs font-black tracking-widest text-slate-400 uppercase flex items-center gap-2">
-                            <i class="fa-solid fa-fire-flame-curved text-brand-accent"></i> Predefined Scenarios
-                        </h4>
-                        <p class="text-xs text-slate-400">Select one preset to simulate specific medical cases and evaluate dynamic alert protocols in action.</p>
-                        
-                        <div class="space-y-2">
-                            <button onclick="triggerSymptomScenario('chest_pain')" class="w-full text-left bg-brand-dark hover:bg-slate-800 border border-brand-border hover:border-red-500/50 p-3 rounded-xl transition-all group flex items-start gap-2.5">
-                                <span class="bg-red-500/10 text-red-400 p-1 rounded-md text-xs mt-0.5"><i class="fa-solid fa-heart-pulse"></i></span>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block group-hover:text-red-400">Emergency Chest Pain</span>
-                                    <span class="text-[10px] text-slate-400 block">Demonstrates immediate urgent RED indicators.</span>
-                                </div>
-                            </button>
-                            <button onclick="triggerSymptomScenario('migraine')" class="w-full text-left bg-brand-dark hover:bg-slate-800 border border-brand-border hover:border-brand-yellow/50 p-3 rounded-xl transition-all group flex items-start gap-2.5">
-                                <span class="bg-brand-yellow/10 text-brand-yellow p-1 rounded-md text-xs mt-0.5"><i class="fa-solid fa-brain"></i></span>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block group-hover:text-brand-yellow">Severe Throbbing Migraine</span>
-                                    <span class="text-[10px] text-slate-400 block">Demonstrates Moderate YELLOW triage guidelines.</span>
-                                </div>
-                            </button>
-                            <button onclick="triggerSymptomScenario('mild_cold')" class="w-full text-left bg-brand-dark hover:bg-slate-800 border border-brand-border hover:border-brand-accent/50 p-3 rounded-xl transition-all group flex items-start gap-2.5">
-                                <span class="bg-brand-accent/10 text-brand-accent p-1 rounded-md text-xs mt-0.5"><i class="fa-solid fa-virus"></i></span>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block group-hover:text-brand-accent">Common Mild Cold</span>
-                                    <span class="text-[10px] text-slate-400 block">Demonstrates Mild GREEN self-care alerts.</span>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Sandbox Disclaimer Alert block -->
-                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
-                        <span class="text-[10px] font-bold text-brand-yellow uppercase tracking-widest block mb-1">Interactive Demo Notes</span>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Once diagnostic sequence reaches consensus, click the <strong>"Compile Diagnostic Summary"</strong> action toggle to review triage profiles.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Right Sandbox: Actual Conversational Panel -->
-                <div class="md:col-span-8 bg-brand-card border-2 border-brand-border rounded-2xl flex flex-col h-full overflow-hidden">
-                    <!-- Chat Messages Scrolling Area -->
-                    <div id="chat-messages-container" class="flex-grow p-5 overflow-y-auto space-y-4 flex flex-col justify-start">
-                        <!-- AI Introduction Message -->
-                        <div class="flex items-start gap-3 max-w-[85%] self-start">
-                            <div class="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center flex-shrink-0 text-sm">
-                                <i class="fa-solid fa-robot"></i>
-                            </div>
-                            <div class="bg-brand-dark border border-brand-border px-4 py-3 rounded-2xl rounded-tl-none text-sm text-slate-200 space-y-2">
-                                <p>Namaste & Hello! I am your AI Diagnostic Assistant, programmed to gather baseline health details, guide symptom classification, and identify alert indicators.</p>
-                                <p class="text-xs text-brand-yellow font-bold"><i class="fa-solid fa-triangle-exclamation"></i> NOTE: I am a high school tech prototype and cannot prescribe medical treatments.</p>
-                                <p class="text-xs">How can I assist you today? Feel free to describe symptoms or select a predefined scenario from the left panel!</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Typing Indicator Spot -->
-                    <div id="typing-indicator" class="px-5 py-2 hidden text-xs text-slate-400 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-notch animate-spin text-brand-accent"></i>
-                        <span>AI Assistant formulating clinical assessment...</span>
-                    </div>
-
-                    <!-- Chat Message Input Controls -->
-                    <div class="p-4 border-t border-brand-border bg-brand-dark/90 flex flex-col gap-3">
-                        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
-                            <input type="text" id="chat-input" placeholder="Type your symptoms here (e.g., I have low fever and dry cough)..." class="flex-grow bg-brand-card border-2 border-brand-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent">
-                            <button type="submit" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark px-5 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </form>
-                        
-                        <div class="flex items-center justify-between flex-wrap gap-2">
-                            <span class="text-[10px] text-slate-500"><i class="fa-solid fa-lock"></i> Sandbox simulation offline pipeline</span>
-                            <!-- Finish summary button (initially disabled/hidden, visible once chat interactions progress) -->
-                            <button onclick="compileSymptomSummary()" id="compile-summary-btn" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg border border-blue-400 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none transition-all flex items-center gap-1.5 animate-bounce">
-                                <i class="fa-solid fa-file-medical"></i> Compile Diagnostic Summary
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: CONSULTATION SUMMARY -->
-        <section id="section-summary" class="hidden py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="text-center space-y-2">
-                <div class="w-14 h-14 bg-brand-accent/10 border-2 border-brand-accent/40 text-brand-accent rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
-                    <i class="fa-solid fa-file-waveform"></i>
-                </div>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">AI Generated Consultation Summary</h1>
-                <p class="text-slate-400 text-sm max-w-xl mx-auto">This structured educational overview encapsulates inputs parsed during AI interactive session protocols.</p>
-            </div>
-
-            <!-- Triage Report Grid -->
-            <div class="bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-6">
-                <!-- Headline Urgency Block -->
-                <div id="summary-urgency-banner" class="p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border">
-                    <div class="flex items-center gap-4 text-center md:text-left">
-                        <div id="summary-urgency-icon-container" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl">
-                            <!-- JS injected icon -->
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-black uppercase tracking-widest block" id="summary-urgency-subtitle">Risk Classification Level</span>
-                            <h3 class="text-xl font-bold" id="summary-urgency-title">Moderate (Consider Consult)</h3>
-                        </div>
-                    </div>
-                    <div class="bg-brand-dark/50 px-4 py-2 rounded-xl border border-brand-border text-center">
-                        <span class="text-xs text-slate-400 block">Symptom Severity Index</span>
-                        <span class="text-sm font-extrabold text-white" id="summary-severity-score">6.5 / 10</span>
-                    </div>
-                </div>
-
-                <!-- Parsed Structured Fields -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-4">
-                        <div class="bg-brand-dark p-5 rounded-2xl border border-brand-border space-y-2">
-                            <span class="text-xs font-extrabold text-brand-accent uppercase tracking-widest block"><i class="fa-solid fa-list-check"></i> Primary Symptoms Captured</span>
-                            <p class="text-sm text-slate-200" id="summary-symptoms-list">Persistent head pressure with heightened light sensitivity.</p>
-                        </div>
-                        <div class="bg-brand-dark p-5 rounded-2xl border border-brand-border space-y-2">
-                            <span class="text-xs font-extrabold text-brand-accent uppercase tracking-widest block"><i class="fa-solid fa-hourglass-half"></i> Duration & Progression</span>
-                            <p class="text-sm text-slate-200" id="summary-duration-display">Approximately 3 consecutive days.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-brand-dark p-5 rounded-2xl border border-brand-border space-y-3">
-                        <span class="text-xs font-extrabold text-brand-accent uppercase tracking-widest block"><i class="fa-solid fa-file-medical"></i> Educational Diagnostic Assessment</span>
-                        <div class="text-sm text-slate-300 leading-relaxed space-y-2" id="summary-assessment-text">
-                            <!-- JS injected assessments -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cautionary Disclaimer Block -->
-                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-start gap-3">
-                    <i class="fa-solid fa-shield text-brand-yellow text-sm mt-0.5"></i>
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        <strong>Educational Prototype Guideline:</strong> Information structured on this screen represents general instructional indicators. This output is completely simulated and should never serve as a clinical recommendation sheet.
-                    </p>
-                </div>
-
-                <!-- Summary CTA Action buttons -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-brand-border">
-                    <button onclick="navigateTo('consult')" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border px-6 py-3 rounded-xl text-sm font-bold text-slate-300 transition-all text-center">
-                        <i class="fa-solid fa-rotate-left"></i> Run New Consultation
-                    </button>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button onclick="navigateTo('doctors')" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border text-slate-200 hover:border-brand-accent px-6 py-3 rounded-xl text-sm font-bold transition-all text-center">
-                            Explore Doctor Profiles
-                        </button>
-                        <button onclick="autoDirectToDoctorBooking()" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-6 py-3 rounded-xl text-sm shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all text-center">
-                            Proceed to Book Consultation
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: DOCTOR DIRECTORY -->
-        <section id="section-doctors" class="hidden py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div class="space-y-2">
-                    <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Available Clinical Partners</span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Discover Demo Care Practitioners</h1>
-                    <p class="text-slate-400 text-sm max-w-xl">Filter and review our prototype roster of experienced healthcare specialists ready for simulation consultations.</p>
-                </div>
-                <!-- Mini Stats indicator -->
-                <span class="bg-brand-accent/10 border border-brand-accent/30 text-brand-accent px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider self-start md:self-auto">
-                    <i class="fa-solid fa-flask mr-1"></i> Demo Environment - 5 Profiles Loaded
-                </span>
-            </div>
-
-            <!-- Directory Filter Bar UI -->
-            <div class="bg-brand-card border-2 border-brand-border rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <!-- Search bar -->
-                <div class="relative w-full md:w-80">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-                    <input type="text" id="search-doctor-input" onkeyup="filterDoctors()" placeholder="Search doctors by name or bio..." class="w-full bg-brand-dark border-2 border-brand-border rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-accent">
-                </div>
-                <!-- Filter categories buttons -->
-                <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
-                    <button onclick="filterDoctorSpecialty('all')" class="specialty-filter-btn px-4 py-2 bg-brand-accent text-brand-dark text-xs font-bold rounded-lg border border-brand-accent transition-all">All Fields</button>
-                    <button onclick="filterDoctorSpecialty('General Physician')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">General Physician</button>
-                    <button onclick="filterDoctorSpecialty('Cardiologist')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Cardiology</button>
-                    <button onclick="filterDoctorSpecialty('Dermatologist')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Dermatology</button>
-                    <button onclick="filterDoctorSpecialty('Pediatrician')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Pediatrics</button>
-                    <button onclick="filterDoctorSpecialty('Dentist')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Dental Care</button>
-                </div>
-            </div>
-
-            <!-- Doctor Card List Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="doctors-cards-grid">
-                <!-- Doctor cards dynamically output here -->
-            </div>
-        </section>
-
-        <!-- SECTION: BOOK APPOINTMENT -->
-        <section id="section-book" class="hidden py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="text-center space-y-2">
-                <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Secure Schedule Portal</span>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Schedule Your Demo Consultation</h1>
-                <p class="text-slate-400 text-sm max-w-lg mx-auto">Complete booking fields with arbitrary details to preview system appointment confirmations.</p>
-            </div>
-
-            <!-- Booking layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <!-- Doctor profile mini card -->
-                <div class="lg:col-span-5 bg-brand-card border-2 border-brand-border rounded-3xl p-6 space-y-4">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-brand-accent block">Booking Selected Provider</span>
-                    <div class="flex items-center gap-4 border-b border-brand-border pb-4" id="booking-doctor-header">
-                        <!-- JS generated summary -->
-                    </div>
-                    <!-- Calendar specs -->
-                    <div class="space-y-3">
-                        <span class="text-xs font-bold text-slate-400 block"><i class="fa-solid fa-hospital-user text-brand-accent"></i> Demo Practice Hours</span>
-                        <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-border text-xs text-slate-300 space-y-1.5">
-                            <div class="flex justify-between">
-                                <span>Mon - Friday:</span>
-                                <span class="font-bold text-white">09:00 AM - 05:00 PM</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Saturday:</span>
-                                <span class="font-bold text-white">10:00 AM - 02:00 PM</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Input form parameters -->
-                <div class="lg:col-span-7 bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-6">
-                    <h3 class="text-lg font-bold text-white border-b border-brand-border pb-3">Consultation Scheduling Parameters</h3>
-                    
-                    <form onsubmit="handleBookingFormSubmit(event)" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Patient Full Name</label>
-                                <input type="text" id="booking-patient-name" value="Aarav Sharma" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Preferred Date</label>
-                                <input type="date" id="booking-date" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Preferred Time Slot</label>
-                                <select id="booking-time" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
-                                    <option value="09:30 AM">09:30 AM</option>
-                                    <option value="11:00 AM">11:00 AM</option>
-                                    <option value="02:00 PM">02:00 PM</option>
-                                    <option value="03:30 PM">03:30 PM</option>
-                                    <option value="04:15 PM">04:15 PM</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Consultation Delivery Channel</label>
-                                <select id="booking-channel" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
-                                    <option value="Digital AI Sandbox Call">Digital AI Assisted Video Call</option>
-                                    <option value="In-person Consultation (Demo Practice)">In-Person Clinical Visit</option>
-                                    <option value="Voice Call Only">Voice Consultation</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Primary Consultation Note</label>
-                            <textarea id="booking-notes" rows="3" class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl p-4 text-xs text-slate-100 focus:outline-none" placeholder="Enter brief overview (e.g., following up on AI triage results)..."></textarea>
-                        </div>
-
-                        <button type="submit" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold py-3.5 rounded-xl text-sm tracking-wide shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-circle-check"></i> Finalize Appointment Booking
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: BOOKING CONFIRMATION -->
-        <section id="section-confirmation" class="hidden py-16 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-brand-card border-2 border-brand-border rounded-3xl p-8 space-y-6 text-center relative overflow-hidden">
-                <!-- Background visual glow -->
-                <div class="absolute -top-10 -left-10 w-40 h-40 bg-brand-accent/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-blue/10 rounded-full blur-3xl"></div>
-
-                <div class="w-16 h-16 bg-brand-accent/20 border-2 border-brand-accent text-brand-accent rounded-full flex items-center justify-center text-3xl mx-auto relative z-10">
-                    <i class="fa-solid fa-check-double"></i>
-                </div>
-                
-                <div class="space-y-2 relative z-10">
-                    <h1 class="text-3xl font-black text-white">Booking Confirmed!</h1>
-                    <p class="text-sm text-slate-400">Your mock healthcare reservation has been registered inside our educational prototype database.</p>
-                </div>
-
-                <!-- Structured booking ID receipt details -->
-                <div id="booking-receipt-box" class="bg-brand-dark p-6 rounded-2xl border-2 border-brand-border text-left space-y-4 relative z-10">
-                    <!-- Injected details -->
-                </div>
-
-                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs text-slate-400 relative z-10 leading-relaxed text-center">
-                    <strong>Demo Protocol Notification:</strong> No actual clinicians will wait during physical clinical spaces for simulated calendars listed above.
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-3 pt-2 relative z-10 justify-center">
-                    <button onclick="navigateTo('dashboard')" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-6 py-3 rounded-xl text-xs shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2.5px] hover:translate-y-[2.5px] transition-all">
-                        Open Appointments Dashboard
-                    </button>
-                    <button onclick="navigateTo('home')" class="bg-brand-dark hover:bg-slate-850 border-2 border-brand-border hover:border-brand-accent px-6 py-3 rounded-xl text-xs font-bold text-slate-200 transition-all">
-                        Return Home
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: PATIENT APPOINTMENTS DASHBOARD -->
-        <section id="section-dashboard" class="hidden py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div class="space-y-2">
-                    <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Patient Information Center</span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Active Appointments & Triage Logs</h1>
-                    <p class="text-slate-400 text-sm">Monitor simulated calendars, review history of symptoms consultation, and update mock baseline details.</p>
-                </div>
-                <!-- Profile snapshot button -->
-                <button onclick="openPatientProfileModal()" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border p-3 rounded-xl flex items-center gap-3 self-start md:self-auto text-left">
-                    <div class="w-9 h-9 rounded-full bg-brand-accent/20 border border-brand-accent flex items-center justify-center text-brand-accent">
-                        <i class="fa-solid fa-user-astronaut"></i>
-                    </div>
-                    <div>
-                        <span class="text-xs font-extrabold text-white block">Aarav Sharma</span>
-                        <span class="text-[10px] text-slate-400 block">Class 12 Demo Patient</span>
-                    </div>
-                </button>
-            </div>
-
-            <!-- Quick metrics tracking boards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-brand-card border-2 border-brand-border p-6 rounded-2xl flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Scheduled Calendars</span>
-                        <span class="text-2xl font-black text-white" id="dashboard-total-appointments">0 Appointments</span>
-                    </div>
-                </div>
-                <div class="bg-brand-card border-2 border-brand-border p-6 rounded-2xl flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-brand-blue/10 border border-brand-blue/30 text-brand-blue flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-clipboard-question"></i>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">AI Triage History</span>
-                        <span class="text-2xl font-black text-white" id="dashboard-total-consultations">0 Completed Runs</span>
-                    </div>
-                </div>
-                <div class="bg-brand-card border-2 border-brand-border p-6 rounded-2xl flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Allergy Vector Alert</span>
-                        <span class="text-xs font-bold text-slate-200">No Penicillin/Sulfa (Demo Profile)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- List Tables (Schedule list) -->
-            <div class="bg-brand-card border-2 border-brand-border rounded-2xl overflow-hidden">
-                <div class="p-5 border-b border-brand-border flex items-center justify-between flex-wrap gap-4">
-                    <h3 class="text-base font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-list text-brand-accent"></i> Active Demo Bookings</h3>
-                    <button onclick="navigateTo('doctors')" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold px-4 py-2 rounded-lg text-xs transition-colors">Book Another Consultation</button>
-                </div>
-                <!-- Dynamic appointments table container -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs md:text-sm">
-                        <thead class="bg-brand-dark text-slate-400 font-extrabold uppercase tracking-wider border-b border-brand-border">
-                            <tr>
-                                <th class="p-4">Doctor Profile</th>
-                                <th class="p-4">Delivery Channel</th>
-                                <th class="p-4">Scheduled Date & Time</th>
-                                <th class="p-4 text-center">Status</th>
-                                <th class="p-4 text-right">Reference Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashboard-appointments-tbody" class="divide-y divide-brand-border text-slate-200">
-                            <!-- Injected rows of bookings -->
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Empty state visual helper inside dashboard -->
-                <div id="dashboard-empty-state" class="hidden p-12 text-center space-y-3">
-                    <i class="fa-regular fa-calendar-times text-4xl text-slate-650"></i>
-                    <p class="text-slate-400 text-sm">No scheduled mock doctor consultations detected within local temporary storage arrays.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: HEALTH RESOURCES (EDUCATIONAL TIPS) -->
-        <section id="section-resources" class="hidden py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="text-center max-w-3xl mx-auto space-y-2">
-                <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Preventive Healthcare Track</span>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight font-sans">Educational Medical Resources</h1>
-                <p class="text-slate-400 text-sm">Explore core diagnostic concepts, preventative lifestyle guidelines, and safety triage methodologies.</p>
-            </div>
-
-            <!-- Health grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Card 1 -->
-                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-                    <div class="p-6 space-y-3">
-                        <span class="bg-brand-blue/10 border border-brand-blue/30 text-brand-blue text-[10px] px-2.5 py-1 rounded font-bold uppercase tracking-wider inline-block">Cardiology</span>
-                        <h3 class="text-lg font-bold text-white">Critical Indicators of Cardiac Dysfunctions</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">Understand major chest discomfort triggers, recognizing critical cardiovascular stress markers, and standard safety emergency maneuvers.</p>
-                    </div>
-                    <div class="p-6 border-t border-brand-border bg-brand-dark/40 flex items-center justify-between text-xs">
-                        <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 5 min read</span>
-                        <a href="https://www.who.int/health-topics/cardiovascular-diseases" target="_blank" class="text-brand-accent font-bold hover:underline">Read WHO Guide <i class="fa-solid fa-arrow-right-long ml-1"></i></a>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-                    <div class="p-6 space-y-3">
-                        <span class="bg-brand-accent/10 border border-brand-accent/30 text-brand-accent text-[10px] px-2.5 py-1 rounded font-bold uppercase tracking-wider inline-block">Triage & Diagnostics</span>
-                        <h3 class="text-lg font-bold text-white">How Clinical Systems Rank Symptom Urgency</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">Review the science of clinical classification, understanding the standard red/yellow/green medical urgency tiers used by paramedics worldwide.</p>
-                    </div>
-                    <div class="p-6 border-t border-brand-border bg-brand-dark/40 flex items-center justify-between text-xs">
-                        <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 7 min read</span>
-                        <a href="https://en.wikipedia.org/wiki/Triage" target="_blank" class="text-brand-accent font-bold hover:underline">Learn Triage <i class="fa-solid fa-arrow-right-long ml-1"></i></a>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
-                    <div class="p-6 space-y-3">
-                        <span class="bg-brand-yellow/10 border border-brand-yellow/30 text-brand-yellow text-[10px] px-2.5 py-1 rounded font-bold uppercase tracking-wider inline-block">Wellness & Hygiene</span>
-                        <h3 class="text-lg font-bold text-white">Combating Seasonal Influenza: Core Preventative Rules</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">Basic sanitary routines, optimal hydration benchmarks, dietary defense tips, and determining when influenza requires prescription consults.</p>
-                    </div>
-                    <div class="p-6 border-t border-brand-border bg-brand-dark/40 flex items-center justify-between text-xs">
-                        <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
-                        <a href="https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)" target="_blank" class="text-brand-accent font-bold hover:underline">WHO Fact Sheet <i class="fa-solid fa-arrow-right-long ml-1"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- High level stats informational infographic -->
-            <div class="bg-brand-card border-2 border-brand-border rounded-3xl p-8 flex flex-col lg:flex-row items-center justify-between gap-8">
-                <div class="space-y-4 max-w-xl">
-                    <h3 class="text-2xl font-extrabold text-white tracking-tight">Understanding Standard Urgency Indicators</h3>
-                    <p class="text-xs text-slate-300 leading-relaxed">
-                        Whenever medical professionals parse triage, patients are cataloged by resource urgency level. MediAI simulates this framework using a three-stage scale:
-                    </p>
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-start gap-3">
-                            <span class="w-2.5 h-2.5 rounded-full bg-brand-accent mt-1.5 flex-shrink-0"></span>
-                            <p class="text-xs text-slate-300"><strong>GREEN (General Information):</strong> Mild issues. Self-monitoring is typically sufficient unless symptoms worsen.</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-2.5 h-2.5 rounded-full bg-brand-yellow mt-1.5 flex-shrink-0"></span>
-                            <p class="text-xs text-slate-300"><strong>YELLOW (Consult Practitioner):</strong> Moderate issues. Schedule a professional clinical consultation to prevent progression.</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-2.5 h-2.5 rounded-full bg-brand-red mt-1.5 flex-shrink-0"></span>
-                            <p class="text-xs text-slate-300"><strong>RED (Emergency Care):</strong> Highly severe. Urgent intervention required. Call local emergency networks immediately.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="w-full lg:w-96 bg-brand-dark p-6 rounded-2xl border border-brand-border space-y-4 text-center">
-                    <div class="text-5xl font-black text-brand-accent text-glow">102</div>
-                    <div class="space-y-1">
-                        <span class="text-xs font-bold text-white block">Democratic Emergency Call Line</span>
-                        <span class="text-[10px] text-slate-450 block leading-relaxed">If physical emergencies manifest, dial 102 immediately (Nepal Ministry of Health demo mapping).</span>
-                    </div>
-                    <div class="border-t border-brand-border pt-4">
-                        <a href="tel:102" class="inline-block bg-red-650 hover:bg-red-750 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">Call Demo Emergency Now</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: ABOUT MEDIAI (PROJECT INFO) -->
-        <section id="section-about" class="hidden py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-            <div class="text-center space-y-2">
-                <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Class 12 AI + Web Exhibition Project</span>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">The Story Behind MediAI Prototype</h1>
-                <p class="text-slate-400 text-sm max-w-xl mx-auto">An advanced web demonstration framework visualizing the potential integrations of artificial intelligence in healthcare delivery structures.</p>
-            </div>
-
-            <!-- Details Block -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                <div class="md:col-span-7 bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-5">
-                    <h3 class="text-xl font-bold text-white border-b border-brand-border pb-3"><i class="fa-solid fa-graduation-cap text-brand-accent"></i> Academic Project Framework</h3>
-                    <p class="text-xs text-slate-300 leading-relaxed">
-                        This web portal has been designed for a Class 12 AI and web design competition. It is designed to illustrate how computer networks and artificial intelligence algorithms can cooperate to lower barriers to preventative triage diagnostics.
-                    </p>
-                    <p class="text-xs text-slate-300 leading-relaxed">
-                        Rather than displaying standard landing fields, our model explores fully end-to-end sandbox workflows: starting from simple user expressions, routing through interactive AI prompt triage models, parsing classification urgency reports, and connecting directly with dummy specialist networks.
-                    </p>
-                    <div class="grid grid-cols-2 gap-4 pt-2">
-                        <div class="bg-brand-dark p-4 rounded-xl border border-brand-border">
-                            <span class="text-brand-accent font-bold text-xl block">100%</span>
-                            <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-extrabold">Responsive Design</span>
-                        </div>
-                        <div class="bg-brand-dark p-4 rounded-xl border border-brand-border">
-                            <span class="text-brand-accent font-bold text-xl block">Tailwind CSS</span>
-                            <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-extrabold">Styling Core</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="md:col-span-5 bg-brand-card border-2 border-brand-border rounded-3xl p-6 space-y-4">
-                    <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-code text-brand-blue"></i> Technical Specifications</h3>
-                    <div class="space-y-3.5 text-xs">
-                        <div class="flex justify-between items-center border-b border-brand-border pb-2">
-                            <span class="text-slate-400">Environment Target:</span>
-                            <span class="font-bold text-slate-200">Class 12 Exhibition</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-brand-border pb-2">
-                            <span class="text-slate-400">Front-End Frame:</span>
-                            <span class="font-bold text-brand-accent">Tailwind CSS v3.x</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-brand-border pb-2">
-                            <span class="text-slate-400">Interactive Engine:</span>
-                            <span class="font-bold text-brand-blue">Vanilla JavaScript State Engine</span>
-                        </div>
-                        <div class="flex justify-between items-center pb-2">
-                            <span class="text-slate-400">Deploy Sandbox:</span>
-                            <span class="font-bold text-slate-200">Localhost / Web Iframe API</span>
-                        </div>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-center">
-                        <span class="text-[10px] font-black tracking-wider uppercase text-brand-yellow block mb-1">Project Integrity Certificate</span>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Engineered strictly with open source design principles. All dummy clinical descriptions represent mock entries.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER DESIGN -->
-    <footer class="bg-brand-dark border-t-2 border-brand-border py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                <div class="md:col-span-5 space-y-4">
-                    <!-- Footer Logo -->
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-brand-accent flex items-center justify-center text-brand-dark font-extrabold text-base">
-                            <i class="fa-solid fa-user-doctor"></i>
-                        </div>
-                        <span class="text-xl font-extrabold tracking-tight text-white">Medi<span class="text-brand-accent">AI</span></span>
-                    </div>
-                    <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
-                        An advanced clinical triage chatbot simulation prototype, designed and configured for High School Web Design & Artificial Intelligence Competitions.
-                    </p>
-                </div>
-                <!-- Links list -->
-                <div class="md:col-span-3 space-y-3 text-xs">
-                    <span class="font-extrabold text-white uppercase tracking-widest block">Simulation Panels</span>
-                    <div class="space-y-2 text-slate-400 font-semibold">
-                        <button onclick="navigateTo('home')" class="block hover:text-white transition-colors">Platform Landing Page</button>
-                        <button onclick="navigateTo('consult')" class="block hover:text-white transition-colors">AI Consultation Assistant</button>
-                        <button onclick="navigateTo('doctors')" class="block hover:text-white transition-colors">Care Practitioner Finder</button>
-                        <button onclick="navigateTo('dashboard')" class="block hover:text-white transition-colors">Active Triage Log Dashboard</button>
-                    </div>
-                </div>
-                <!-- Disclaimer box -->
-                <div class="md:col-span-4 space-y-3">
-                    <span class="text-xs font-extrabold text-white uppercase tracking-widest block">Strict Sandbox Warning</span>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">
-                        This service does not provide certified medical evaluations. All clinical diagnostic advice presented inside conversations is compiled from demonstration response scripts. If experiencing emergencies, seek credentialed expert consults.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Bottom border segment -->
-            <div class="border-t border-brand-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-                <p>&copy; 2025 MediAI Project Prototype. Prepared for Class 12 Web Design & AI Competitions.</p>
-                <div class="flex items-center gap-4 font-bold">
-                    <a href="#" onclick="navigateTo('about')" class="hover:text-slate-350">Developer Details</a>
-                    <span>•</span>
-                    <a href="#" onclick="alert('Demo prototype does not maintain private telemetry trackers.')" class="hover:text-slate-350">Privacy Guidelines</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- INTERACTIVE PATIENT PROFILE MODAL -->
-    <div id="patient-profile-modal" class="fixed inset-0 z-50 hidden bg-brand-dark/85 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-brand-card border-2 border-brand-border rounded-3xl max-w-md w-full p-6 relative space-y-6">
-            <button onclick="closePatientProfileModal()" class="absolute top-4 right-4 w-9 h-9 rounded-lg border border-brand-border flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="text-center space-y-2">
-                <div class="w-16 h-16 rounded-full bg-brand-accent/20 border-2 border-brand-accent flex items-center justify-center text-brand-accent text-3xl mx-auto">
-                    <i class="fa-solid fa-user-astronaut"></i>
-                </div>
-                <h3 class="text-lg font-black text-white">Active Patient Credentials</h3>
-                <span class="text-[10px] bg-brand-accent/20 text-brand-accent border border-brand-accent/30 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">Default Demo Session Profile</span>
-            </div>
-
-            <!-- Profile Info block -->
-            <div class="space-y-3 text-xs">
-                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
-                    <span class="text-slate-400">Patient Full Name:</span>
-                    <span class="font-bold text-white">Aarav Sharma</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
-                    <span class="text-slate-400">Demographic Age / Sex:</span>
-                    <span class="font-bold text-white">24 Years Old / Male</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
-                    <span class="text-slate-400">Primary Location:</span>
-                    <span class="font-bold text-white">Kathmandu, Nepal</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
-                    <span class="text-slate-400">Medical Allergy Tiers:</span>
-                    <span class="font-bold text-brand-red">Hypersensitive to Penicillin Compounds</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-400">Current Blood Group:</span>
-                    <span class="font-bold text-white">O Positive (O+)</span>
-                </div>
-            </div>
-
-            <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-border text-center text-xs text-slate-400">
-                You can alter booking names directly inside the scheduling screen inputs during reservation sequences.
-            </div>
-
-            <button onclick="closePatientProfileModal()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold py-3 rounded-xl text-xs transition-colors">
-                Return to Sandbox Console
-            </button>
-        </div>
+    <div class="notification-panel" id="notifications">
+      <div class="notif-head">Notifications <button style="color:var(--blue);background:none;font-size:11px;font-weight:800" onclick="markRead()">Mark all read</button></div>
+      <div class="notif"><div class="notif-icon">✓</div><div><b>Your reported streetlight issue has been resolved.</b><small>Today, 10:42 AM</small></div></div>
+      <div class="notif"><div class="notif-icon">◌</div><div><b>CV-2026-1038 is now under review.</b><small>Yesterday</small></div></div>
+      <div class="notif"><div class="notif-icon">↑</div><div><b>12 people supported your water leakage report.</b><small>Mar 14, 2026</small></div></div>
     </div>
 
-    <!-- JAVASCRIPT STATE CONTROLLER -->
-    <script>
-        // GLOBAL DATA MODELS & STATE CONTROLS
-        let activeScreen = 'home';
-        let language = 'en';
+    <section class="content">
+      <div class="view active" id="dashboard">
+        <div class="welcome"><div class="welcome-content"><h1>Good morning, Alex.<br>Make your city better.</h1><p>Report an issue in seconds. CivicVoice uses AI to make sure your concern reaches the right people, clearly and quickly.</p><button class="btn white-btn" onclick="goPage('report')">Report a Problem <span>→</span></button></div></div>
+        <div class="stats" id="stats"></div>
+        <div class="dash-grid">
+          <div>
+            <div class="section-head"><div><h2>Community activity</h2><p>Issues reported in your area this week</p></div><button class="btn btn-secondary" onclick="goPage('community')">View community →</button></div>
+            <div class="card chart-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Reports this week</h3><span class="status progress">+18.4%</span></div><div class="chart-bars" id="chartBars"></div></div>
+            <div class="section-head"><div><h2>Recent community complaints</h2><p>What your neighbors are reporting</p></div></div>
+            <div class="card list-card" id="recentList"></div>
+          </div>
+          <div>
+            <div class="section-head"><div><h2>How it works</h2><p>A faster path to resolution</p></div></div>
+            <div class="card"><div class="process"><div class="process-step"><span class="process-no">1</span><div>Report<br><small class="muted" style="font-weight:500">Share the problem your way.</small></div></div><div class="process-step"><span class="process-no">✦</span><div>AI Organizes<br><small class="muted" style="font-weight:500">We structure your report.</small></div></div><div class="process-step"><span class="process-no">3</span><div>Authority Reviews<br><small class="muted" style="font-weight:500">Right department notified.</small></div></div><div class="process-step"><span class="process-no">✓</span><div>Resolution<br><small class="muted" style="font-weight:500">Track progress in real time.</small></div></div></div><button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="goPage('report')">Start a report</button></div>
+          </div>
+        </div>
+      </div>
 
-        // Simulated Database for Booked Appointments
-        let appointments = [];
-        // Track completed consultations
-        let completedConsultCount = 0;
+      <div class="view" id="report">
+        <div class="report-layout">
+          <h1>Report a problem</h1><p class="lead">Tell us what happened. Our Civic AI will turn your report into a clear, actionable complaint for the responsible department.</p>
+          <div class="steps" id="steps"><div class="step on"><span class="step-badge">1</span>Details</div><div class="step"><span class="step-badge">2</span>AI Review</div><div class="step"><span class="step-badge">3</span>Submit</div></div>
+          <div class="card form-card">
+            <div class="form-pane active" id="pane1">
+              <h2>What needs attention?</h2><p class="muted" style="font-size:13px">Add a photo and a few details. Fields marked with * are required.</p>
+              <div class="dropzone" id="dropzone"><div class="drop-icon">⌁</div><strong>Drag & drop a photo here</strong><span>or choose an image from your device (optional)</span><button type="button" class="btn btn-secondary" onclick="document.getElementById('photoInput').click()">Browse files</button><input type="file" accept="image/*" id="photoInput" hidden><img class="uploaded-preview" id="photoPreview"></div>
+              <div class="field" style="margin-top:18px"><label>Describe the issue *</label><div class="voice-row"><textarea id="description" placeholder="Example: The streetlight outside the bus stop has not worked for two weeks..."></textarea><button class="voice-btn" id="voiceBtn" title="Voice input" onclick="voiceInput()">◉</button></div><small class="muted" id="voiceHint" style="font-size:11px">You can type naturally — Civic AI will organize it.</small></div>
+              <div class="form-grid"><div class="field"><label>Location *</label><input id="location" placeholder="e.g. Near Main Road bus stop"></div><div class="field"><label>Category *</label><select id="category"><option value="">Choose a category</option><option>Road</option><option>Streetlight</option><option>Water</option><option>Public Property</option><option>Drainage</option><option>Traffic</option><option>Public Facility</option><option>Other</option></select></div></div>
+              <div class="form-actions"><span class="muted" style="font-size:12px">Your contact details remain private.</span><button class="btn btn-primary" onclick="startAnalysis()">Analyze with Civic AI →</button></div>
+            </div>
+            <div class="form-pane" id="pane2"><div id="analysisContent"></div></div>
+            <div class="form-pane" id="pane3"><div class="success"><div class="success-mark">✓</div><h2>Your voice has been heard!</h2><p class="muted">Your complaint has been submitted to the responsible department.</p><div class="id-chip" id="successId">CV-2026-1042</div><p style="font-size:12px;color:var(--muted);max-width:400px;margin:0 auto 20px">We'll notify you as your report moves from review to resolution.</p><button class="btn btn-primary" onclick="goPage('complaints')">Track my complaint →</button><button class="btn btn-secondary" style="margin-left:7px" onclick="newReport()">Report another</button></div></div>
+          </div>
+        </div>
+      </div>
 
-        // Active Chat Log Variables
-        let chatMessages = [];
-        let chatStep = 0; 
-        let activeSymptomScenario = null; 
-        let compiledSymptomData = {
-            symptoms: "Awaiting consultation run",
-            duration: "N/A",
-            severity: 5,
-            level: "GREEN",
-            assessment: "No analysis generated yet."
-        };
+      <div class="view" id="complaints">
+        <div class="section-head" style="margin-top:0"><div><h1>My complaints</h1><p class="lead">Keep track of every issue you have reported.</p></div><button class="btn btn-primary" onclick="goPage('report')">＋ New report</button></div>
+        <div class="toolbar"><div class="search"><input id="mySearch" oninput="renderMyComplaints()" placeholder="Search by ID, location or issue..."></div><select class="filter-select" id="myCategory" onchange="renderMyComplaints()"><option value="">All categories</option><option>Road</option><option>Streetlight</option><option>Water</option><option>Public Property</option><option>Drainage</option><option>Traffic</option><option>Public Facility</option><option>Other</option></select><select class="filter-select" id="myStatus" onchange="renderMyComplaints()"><option value="">All statuses</option><option value="submitted">Submitted</option><option value="review">Under Review</option><option value="progress">In Progress</option><option value="resolved">Resolved</option></select></div>
+        <div class="card list-card complaint-table"><div class="table-head"><div>Complaint ID</div><div>Category / Issue</div><div>Date</div><div>Location</div><div>Status</div><div>Priority</div></div><div id="myList"></div></div>
+      </div>
 
-        // Doctor Static Demo Dataset
-        const doctorsData = [
-            {
-                id: 'doc-1',
-                name: "Dr. Sanduk Ruit (Demo Profile)",
-                specialty: "General Physician",
-                experience: "15 Years",
-                rating: "4.9",
-                availability: "Mon, Wed, Fri",
-                fee: "NPR 1,000",
-                img: "fa-user-doctor",
-                bio: "Experienced internal medicine and clinical physician specializing in chronic symptom evaluation and primary triage care."
-            },
-            {
-                id: 'doc-2',
-                name: "Dr. Bhagwan Koirala (Demo Profile)",
-                specialty: "Cardiologist",
-                experience: "22 Years",
-                rating: "5.0",
-                availability: "Tue, Thu",
-                fee: "NPR 2,500",
-                img: "fa-heart-pulse",
-                bio: "Expert cardiology consultant. Specializes in heart valve diagnostics, vascular monitoring, and cardiac risk assessment."
-            },
-            {
-                id: 'doc-3',
-                name: "Dr. Melina Rai (Demo Profile)",
-                specialty: "Dermatologist",
-                experience: "9 Years",
-                rating: "4.7",
-                availability: "Mon, Tue, Thu",
-                fee: "NPR 1,200",
-                img: "fa-stethoscope",
-                bio: "Dedicated dermatology care focusing on acute rashes, diagnostic skin allergy logs, and persistent pediatric skin triggers."
-            },
-            {
-                id: 'doc-4',
-                name: "Dr. Aarav Joshi (Demo Profile)",
-                specialty: "Pediatrician",
-                experience: "11 Years",
-                rating: "4.8",
-                availability: "Wed, Fri, Sat",
-                fee: "NPR 1,100",
-                img: "fa-baby",
-                bio: "Friendly and highly trusted pediatrician specializing in childhood vaccination plans, immune building, and developmental checkups."
-            },
-            {
-                id: 'doc-5',
-                name: "Dr. Samata Shrestha (Demo Profile)",
-                specialty: "Dentist",
-                experience: "7 Years",
-                rating: "4.6",
-                availability: "Mon, Wed, Sat",
-                fee: "NPR 800",
-                img: "fa-tooth",
-                bio: "Expert in restorative dental care, root canal procedures, pediatric oral hygiene, and cosmetic dental operations."
-            }
-        ];
+      <div class="view" id="community">
+        <div class="section-head" style="margin-top:0"><div><h1>Community voice</h1><p class="lead">Explore local issues. Support a report to show authorities what matters most.</p></div><button class="btn btn-primary" onclick="goPage('report')">＋ Report issue</button></div>
+        <div class="community-layout"><div><div class="toolbar"><div class="search"><input id="communitySearch" oninput="renderCommunity()" placeholder="Search community reports..."></div><select class="filter-select" id="communityCat" onchange="renderCommunity()"><option value="">All categories</option><option>Road</option><option>Streetlight</option><option>Water</option><option>Public Property</option><option>Drainage</option><option>Traffic</option><option>Public Facility</option><option>Other</option></select><select class="filter-select" id="communitySort" onchange="renderCommunity()"><option value="new">Newest first</option><option value="support">Most supported</option></select></div><div class="card feed-card" id="communityFeed"></div></div>
+          <aside class="community-side"><div class="insight"><div style="font-size:22px;margin-bottom:8px">✦</div><h3>Stronger together</h3><p>Supporting a verified concern helps the city prioritize shared problems without creating duplicate reports.</p><button class="btn white-btn" style="padding:8px 11px;font-size:11px" onclick="goPage('map')">Explore issue map</button></div><div class="card"><h3>Trending near you</h3><div class="trend"><span>💡 Streetlights</span><span>18 reports</span></div><div class="trend"><span>💧 Water supply</span><span>12 reports</span></div><div class="trend"><span>🛣 Roads</span><span>9 reports</span></div></div></aside>
+        </div>
+      </div>
 
-        let selectedDoctor = doctorsData[0];
+      <div class="view" id="map">
+        <div class="section-head" style="margin-top:0"><div><h1>Issue map</h1><p class="lead">A live view of reported community concerns in your city.</p></div><div class="toolbar" style="margin:0"><select class="filter-select" id="mapCat" onchange="renderMap()"><option value="">All categories</option><option>Road</option><option>Streetlight</option><option>Water</option><option>Public Property</option><option>Drainage</option><option>Traffic</option></select></div></div>
+        <div class="card map-wrap"><div class="map-canvas" id="mapCanvas"><span class="map-label" style="left:13%;top:25%">Main Road</span><span class="map-label" style="left:51%;top:35%">Civic Center</span><span class="map-label" style="left:65%;top:75%">Market Area</span><span class="map-label" style="left:23%;top:71%">Riverside Park</span><div class="map-controls"><button onclick="mapZoom(1)">+</button><button onclick="mapZoom(-1)">−</button><button onclick="showToast('Map centered on your demo location','success')">⌖</button></div><div class="map-popup" id="mapPopup"></div></div></div>
+        <p class="muted" style="font-size:11px;margin:10px 4px">Demo map • Select a pin to see issue details. Markers represent active public reports.</p>
+      </div>
 
-        // NEPOLI TRANSLATIONS DICTIONARY
-        const dictionary = {
-            en: {
-                subtitle: "Understand your health concerns, get general health information, and discover the right next step with AI.",
-                primaryBtn: "Start AI Consultation",
-                secondaryBtn: "Find a Doctor",
-                emergency: "<strong>Immediate Medical Warning:</strong> If you are experiencing a severe emergency, please contact your local emergency services immediately.",
-            },
-            ne: {
-                subtitle: "आफ्नो स्वास्थ्य समस्याहरू बुझ्नुहोस्, सामान्य स्वास्थ्य जानकारी प्राप्त गर्नुहोस्, र एआईको सहयोगमा सही अर्को कदम पत्ता लगाउनुहोस्।",
-                primaryBtn: "एआई परामर्श सुरु गर्नुहोस्",
-                secondaryBtn: "चिकित्सक पत्ता लगाउनुहोस्",
-                emergency: "<strong>तत्काल चिकित्सा चेतावनी:</strong> यदि तपाईं गम्भीर आपतकालीन अवस्था सामना गर्दै हुनुहुन्छ भने, कृपया तुरुन्तै स्थानीय आपतकालीन सेवाहरूमा सम्पर्क गर्नुहोस्।",
-            }
-        };
+      <div class="view" id="about">
+        <div class="about-hero"><h1>Your city works better<br>when every voice counts.</h1><p>CivicVoice is an AI-powered public complaint assistant built to make reporting civic issues simple, structured, and transparent. We help people turn everyday observations into action-ready reports.</p><button class="btn white-btn" onclick="goPage('report')">Make a report →</button></div>
+        <div class="section-head"><div><h2>Built for better civic action</h2><p>Clear reporting. Smart routing. Visible progress.</p></div></div>
+        <div class="feature-grid"><div class="card feature-card"><div class="cat-icon">✦</div><h3>AI-powered clarity</h3><p>Natural language and photo reports are transformed into professional, complete submissions that authorities can act on.</p></div><div class="card feature-card"><div class="cat-icon" style="--tone:#dcf7ef">⌁</div><h3>Smart routing</h3><p>Each issue is categorized and directed to the department best placed to respond quickly.</p></div><div class="card feature-card"><div class="cat-icon" style="--tone:#fff0d9">◉</div><h3>Community momentum</h3><p>Support shared local concerns and help decision-makers see what needs attention most.</p></div></div>
+        <div class="card" style="margin-top:18px"><h2>Competition project</h2><p class="lead" style="max-width:none">CivicVoice is a demonstration of how thoughtful AI can bridge the gap between citizens and public services — turning frustration into an organized, trackable path to resolution.</p></div>
+      </div>
+    </section>
+  </main>
+</div>
 
-        // DOM RENDER ON STARTUP
-        window.addEventListener('DOMContentLoaded', () => {
-            renderDoctorsList();
-            renderAppointmentsDashboard();
-            updateDashboardCounters();
-            
-            // Set dynamic date picker to default to tomorrow's date
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            document.getElementById('booking-date').value = tomorrow.toISOString().split('T')[0];
-        });
+<button class="assistant-toggle" onclick="toggleAssistant()" title="Open Civic AI assistant">✦</button>
+<div class="assistant-panel" id="assistantPanel">
+  <div class="assistant-header"><div><b>✦ Civic AI Assistant</b><small>Tell me what happened, naturally.</small></div><button class="close-x" onclick="toggleAssistant()">×</button></div>
+  <div class="chat" id="chat"><div class="bubble bot">Hi Alex! Describe a public issue and I'll organize it into a ready-to-report complaint.<br><br><small>Try: “My streetlight has been broken for two weeks near the bus stop.”</small></div></div>
+  <div class="assistant-input"><input id="assistantText" placeholder="Describe an issue..." onkeydown="if(event.key==='Enter') assistantSend()"><button onclick="assistantSend()">↑</button></div>
+</div>
 
-        // SPA NAVIGATION SYSTEM
-        function navigateTo(screenId) {
-            // Hide all screen sections
-            const screens = ['home', 'consult', 'summary', 'doctors', 'book', 'confirmation', 'dashboard', 'resources', 'about'];
-            screens.forEach(s => {
-                const element = document.getElementById(`section-${s}`);
-                if (element) {
-                    element.classList.add('hidden');
-                }
-            });
+<div class="modal-backdrop" id="detailModal"><div class="modal"><div class="modal-head"><b id="modalTitle">Complaint details</b><button class="icon-btn" onclick="closeModal()">×</button></div><div class="modal-body" id="modalBody"></div></div></div>
+<div class="confirm-backdrop" id="confirmModal"><div class="confirm"><h2 id="confirmTitle">Confirm submission</h2><p class="muted" id="confirmText" style="font-size:13px;line-height:1.5">Are you ready to submit this report?</p><div class="confirm-actions"><button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button><button class="btn btn-primary" id="confirmYes">Confirm</button></div></div></div>
+<div class="toast-wrap" id="toasts"></div>
 
-            // Show selected screen section
-            const activeElement = document.getElementById(`section-${screenId}`);
-            if (activeElement) {
-                activeElement.classList.remove('hidden');
-            }
-            activeScreen = screenId;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+<script>
+  const baseComplaints = [
+    {id:"CV-2026-1038",category:"Streetlight",title:"Broken streetlight near Main Road bus stop",description:"The streetlight outside the Main Road bus stop has not been functioning for approximately two weeks, making the area unsafe after dark.",location:"Main Road Bus Stop",date:"Mar 15, 2026",status:"review",priority:"Medium",department:"Electrical Maintenance Department",support:24,icon:"💡",pos:[24,31],updates:["Submitted by you on Mar 15, 2026","Assigned to Electrical Maintenance Department","Awaiting field inspection"]},
+    {id:"CV-2026-1031",category:"Road",title:"Damaged road surface near Bus Park",description:"A large pothole and damaged road surface are causing difficulty for buses and pedestrians near the eastern entrance.",location:"Bus Park, East Entrance",date:"Mar 11, 2026",status:"progress",priority:"High",department:"Roads & Transport Department",support:18,icon:"🛣",pos:[53,43],updates:["Submitted by you on Mar 11, 2026","Verified by Roads & Transport Department","Repair crew scheduled for this week"]},
+    {id:"CV-2026-1019",category:"Water",title:"Water leakage near public tap",description:"Continuous water leakage from the public tap connection is wasting water and creating a slippery walkway.",location:"Greenfield Ward 4",date:"Mar 04, 2026",status:"resolved",priority:"Medium",department:"Water Supply Department",support:12,icon:"💧",pos:[67,66],updates:["Submitted by you on Mar 04, 2026","Under review by Water Supply Department","Repair completed on Mar 10, 2026"]},
+    {id:"CV-2026-1013",category:"Drainage",title:"Blocked drainage near Market Area",description:"Drainage is blocked with waste near the market entrance. Water pools after rainfall and obstructs pedestrians.",location:"Market Area, Gate 2",date:"Mar 01, 2026",status:"submitted",priority:"High",department:"Sanitation & Drainage Department",support:36,icon:"🌊",pos:[72,76],updates:["Submitted by you on Mar 01, 2026","Report received by CivicVoice","Pending authority assignment"]},
+    {id:"CV-2026-1006",category:"Public Property",title:"Damaged public bench in Riverside Park",description:"One of the benches near the playground is damaged and has exposed sharp edges that could cause injury.",location:"Riverside Park Playground",date:"Feb 26, 2026",status:"progress",priority:"Medium",department:"Parks & Public Spaces Department",support:9,icon:"🪑",pos:[31,69],updates:["Submitted by you on Feb 26, 2026","Reviewed by Parks & Public Spaces","Replacement bench requested"]},
+    {id:"CV-2026-1002",category:"Traffic",title:"Traffic signal timing issue at Civic Junction",description:"The pedestrian crossing signal changes too quickly during peak hours.",location:"Civic Junction",date:"Feb 22, 2026",status:"review",priority:"Medium",department:"Traffic Management Department",support:15,icon:"🚦",pos:[49,36],updates:["Submitted on Feb 22, 2026","Assigned to Traffic Management","Signal timing review in progress"]}
+  ];
+  const pageMeta={dashboard:["Dashboard","Your city, heard and improved."],report:["Report a Problem","Let Civic AI organize your report."],complaints:["My Complaints","Track your reports and their progress."],community:["Community","Local issues, shared momentum."],map:["Issue Map","Explore reported issues around you."],about:["About CivicVoice","Technology for more responsive cities."]};
+  const catIcons={Road:"🛣",Streetlight:"💡",Water:"💧","Public Property":"🏛",Drainage:"🌊",Traffic:"🚦","Public Facility":"🏢",Other:"⚑"};
+  let complaints=[], reportStep=1, photoData="", generated=null, zoom=1;
 
-        // MOBILE NAVIGATION BAR HAMBURGER CONTROL
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const icon = document.getElementById('menu-icon');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                icon.className = "fa-solid fa-xmark text-xl";
-            } else {
-                menu.classList.add('hidden');
-                icon.className = "fa-solid fa-bars text-xl";
-            }
-        }
-
-        // LANGUAGE DICTIONARY SELECTOR SWITCH
-        function toggleLanguage() {
-            language = (language === 'en') ? 'ne' : 'en';
-            const langBtn = document.getElementById('lang-switch-btn');
-            
-            if (language === 'ne') {
-                langBtn.innerHTML = `<i class="fa-solid fa-language text-base text-brand-accent"></i> <span>English / EN</span>`;
-                // Apply localization translations
-                document.getElementById('hero-subtitle').innerText = dictionary.ne.subtitle;
-                document.getElementById('hero-btn-primary').innerText = dictionary.ne.primaryBtn;
-                document.getElementById('hero-btn-secondary').innerText = dictionary.ne.secondaryBtn;
-                document.getElementById('nav-emergency-banner').innerHTML = dictionary.ne.emergency;
-            } else {
-                langBtn.innerHTML = `<i class="fa-solid fa-language text-base text-brand-accent"></i> <span>नेपाली / EN</span>`;
-                // Apply localization translations
-                document.getElementById('hero-subtitle').innerText = dictionary.en.subtitle;
-                document.getElementById('hero-btn-primary').innerText = dictionary.en.primaryBtn;
-                document.getElementById('hero-btn-secondary').innerText = dictionary.en.secondaryBtn;
-                document.getElementById('nav-emergency-banner').innerHTML = dictionary.en.emergency;
-            }
-        }
-
-        // MODAL CONTROLLERS
-        function openPatientProfileModal() {
-            document.getElementById('patient-profile-modal').classList.remove('hidden');
-        }
-        function closePatientProfileModal() {
-            document.getElementById('patient-profile-modal').classList.add('hidden');
-        }
-
-        // DOCK CHAT SIMULATION LOGICS & SYMPTOM PATHWAYS
-        const symptomFlows = {
-            chest_pain: {
-                urgency: 'RED',
-                symptoms: "Sudden sharp left-sided crushing chest pain radiating to left arm",
-                duration: "Active for 30 minutes, escalating rapidly",
-                severity: 9.5,
-                dialogues: [
-                    {
-                        ai: "Warning: Chest pressure of sudden onset is classified as high acute risk. Does the pain radiate to your left shoulder, jaw, or neck, and are you breathing heavily?"
-                    },
-                    {
-                        user: "Yes, it is radiating into my left arm, and I am feeling highly nauseous and sweating."
-                    },
-                    {
-                        ai: "CRITICAL SYSTEM NOTICE: These parameters closely correlate with Acute Cardiac Stress indicators. This simulation recommends immediate emergency action. We have locked high-urgency diagnostic codes."
-                    }
-                ],
-                assessment: "The simulated parameters strongly reflect a potential Acute Coronary Episode or significant cardiovascular distress pattern. This is a critical class RED indicator."
-            },
-            migraine: {
-                urgency: 'YELLOW',
-                symptoms: "Severe throbbing unilateral headache with photosensitivity",
-                duration: "Present for 2 days",
-                severity: 6.8,
-                dialogues: [
-                    {
-                        ai: "Are you currently noticing sensory aura, blurred vision boundaries, or nausea triggered by bright lights or loud environments?"
-                    },
-                    {
-                        user: "Yes, standard lights hurt my eyes intensely, and I hear a slight ringing sound."
-                    },
-                    {
-                        ai: "Assessment logged. Your symptoms align with severe neurological migraine conditions. While not immediately life-threatening, a professional doctor visit is recommended to obtain appropriate prescription medication pathways."
-                    }
-                ],
-                assessment: "Symptoms are highly suggestive of severe migraine with photosensitivity and minor auditory strain. Recommend consult with a General Physician or Neurologist to discuss abortive therapies."
-            },
-            mild_cold: {
-                urgency: 'GREEN',
-                symptoms: "Mild scratchy throat, nasal congestion, occasional dry sneezing",
-                duration: "1 day",
-                severity: 3.2,
-                dialogues: [
-                    {
-                        ai: "Are you experiencing high body temperature, difficulty breathing, or severe pain when swallowing?"
-                    },
-                    {
-                        user: "No, breathing is standard. No fever. Just a slightly dry and congested nasal airway."
-                    },
-                    {
-                        ai: "Noted. Nasal congestion and throat itching without systemic fever typical point to localized rhinitis or mild seasonal flu vectors. Monitor temperature closely."
-                    }
-                ],
-                assessment: "Indicates mild Upper Respiratory congestion. Self-care protocols including warm hydration, saline throat rinses, and systemic rest should be followed. Monitor for developments."
-            }
-        };
-
-        // SCENARIOS ACTIVATION TRIGGERS
-        function triggerSymptomScenario(scenarioKey) {
-            activeSymptomScenario = symptomFlows[scenarioKey];
-            chatStep = 0;
-            
-            // Clear message list and insert baseline intro
-            const container = document.getElementById('chat-messages-container');
-            container.innerHTML = `
-                <div class="flex items-start gap-3 max-w-[85%] self-start">
-                    <div class="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center flex-shrink-0 text-sm">
-                        <i class="fa-solid fa-robot"></i>
-                    </div>
-                    <div class="bg-brand-dark border border-brand-border px-4 py-3 rounded-2xl rounded-tl-none text-sm text-slate-200">
-                        <p class="font-bold text-brand-accent mb-1"><i class="fa-solid fa-circle-play"></i> Preset Loaded: ${scenarioKey.toUpperCase().replace('_', ' ')}</p>
-                        <p>Loading interactive simulation path. Follow the prompts below to preview standard clinical outputs.</p>
-                    </div>
-                </div>
-            `;
-
-            // Display User symptom statement
-            setTimeout(() => {
-                appendChatMessage('user', activeSymptomScenario.symptoms);
-                updateUrgencyDisplay(activeSymptomScenario.urgency);
-                
-                // Show AI typing follow-up
-                triggerAITypingResponse(() => {
-                    appendChatMessage('ai', activeSymptomScenario.dialogues[0].ai);
-                    chatStep = 1;
-                });
-            }, 800);
-        }
-
-        // CHAT MESSAGE DOM HANDLERS
-        function appendChatMessage(sender, text) {
-            const container = document.getElementById('chat-messages-container');
-            const messageRow = document.createElement('div');
-            
-            if (sender === 'user') {
-                messageRow.className = "flex items-start gap-3 max-w-[85%] self-end flex-row-reverse";
-                messageRow.innerHTML = `
-                    <div class="w-8 h-8 rounded-lg bg-brand-blue/10 border border-brand-blue/30 text-brand-blue flex items-center justify-center flex-shrink-0 text-sm">
-                        <i class="fa-solid fa-user-astronaut"></i>
-                    </div>
-                    <div class="bg-brand-blue/10 border border-brand-blue/30 px-4 py-3 rounded-2xl rounded-tr-none text-sm text-slate-200">
-                        <p>${text}</p>
-                    </div>
-                `;
-            } else {
-                messageRow.className = "flex items-start gap-3 max-w-[85%] self-start";
-                messageRow.innerHTML = `
-                    <div class="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center flex-shrink-0 text-sm">
-                        <i class="fa-solid fa-robot"></i>
-                    </div>
-                    <div class="bg-brand-dark border border-brand-border px-4 py-3 rounded-2xl rounded-tl-none text-sm text-slate-200">
-                        <p>${text}</p>
-                    </div>
-                `;
-            }
-            
-            container.appendChild(messageRow);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // AI TYPING INDICATOR TIMERS
-        function triggerAITypingResponse(callback) {
-            const indicator = document.getElementById('typing-indicator');
-            indicator.classList.remove('hidden');
-            setTimeout(() => {
-                indicator.classList.add('hidden');
-                callback();
-            }, 1200);
-        }
-
-        // CHAT FORM INTERACTIVE CONTROLLER (Manual messages)
-        function handleChatSubmit(event) {
-            event.preventDefault();
-            const input = document.getElementById('chat-input');
-            const userMsg = input.value.trim();
-            if (!userMsg) return;
-
-            appendChatMessage('user', userMsg);
-            input.value = '';
-
-            // Handle script logic sequences
-            if (activeSymptomScenario) {
-                if (chatStep === 1) {
-                    triggerAITypingResponse(() => {
-                        appendChatMessage('ai', activeSymptomScenario.dialogues[1].ai);
-                        chatStep = 2;
-                    });
-                } else if (chatStep === 2) {
-                    triggerAITypingResponse(() => {
-                        appendChatMessage('ai', "Thank you for detailing those developments. Our assessment metrics are completely finalized. Click the 'Compile Diagnostic Summary' button below to review your triage card.");
-                    });
-                } else {
-                    triggerStandardGenericAIResponse();
-                }
-            } else {
-                // If user didn't select scenario, automatically map to standard Yellow response to keep prototype fully cohesive
-                triggerAITypingResponse(() => {
-                    appendChatMessage('ai', "Your stated concern has been logged. Let's run our moderate classification preset: Severe Throbbing Headache with photophobia. Is the pain localized to one side of the head, and do bright screens worsen your condition?");
-                    // Lock-in migraine flow for ease of live simulation
-                    activeSymptomScenario = symptomFlows.migraine;
-                    chatStep = 1;
-                    updateUrgencyDisplay('YELLOW');
-                });
-            }
-        }
-
-        // Standard Fallback AI
-        function triggerStandardGenericAIResponse() {
-            triggerAITypingResponse(() => {
-                appendChatMessage('ai', "I have documented your follow-up data. Please click 'Compile Diagnostic Summary' below to map these outcomes to suggested specialist doctor care.");
-            });
-        }
-
-        // UPDATE CHAT URGENCY LEVEL PILLS
-        function updateUrgencyDisplay(level) {
-            const pill = document.getElementById('urgency-pill-display');
-            if (level === 'RED') {
-                pill.className = "bg-red-500/20 border border-red-500 text-red-400 px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider animate-pulse";
-                pill.innerText = "RED – Urgent Care Required";
-            } else if (level === 'YELLOW') {
-                pill.className = "bg-brand-yellow/20 border border-brand-yellow text-brand-yellow px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider";
-                pill.innerText = "YELLOW – Consult Doctor";
-            } else {
-                pill.className = "bg-brand-accent/20 border border-brand-accent text-brand-accent px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider";
-                pill.innerText = "GREEN – General Information";
-            }
-        }
-
-        // COMPILE CHAT TO REPORT SCREEN
-        function compileSymptomSummary() {
-            // Build fallback compiled statistics if user clicked bypass
-            if (!activeSymptomScenario) {
-                activeSymptomScenario = symptomFlows.migraine; 
-            }
-
-            compiledSymptomData = {
-                symptoms: activeSymptomScenario.symptoms,
-                duration: activeSymptomScenario.duration,
-                severity: activeSymptomScenario.severity,
-                level: activeSymptomScenario.urgency,
-                assessment: activeSymptomScenario.assessment
-            };
-
-            completedConsultCount++;
-            updateDashboardCounters();
-
-            // Populate Report elements
-            const banner = document.getElementById('summary-urgency-banner');
-            const badgeIconContainer = document.getElementById('summary-urgency-icon-container');
-            const urgencyTitle = document.getElementById('summary-urgency-title');
-            const urgencySubtitle = document.getElementById('summary-urgency-subtitle');
-            const severityScore = document.getElementById('summary-severity-score');
-            
-            // Symptoms lists
-            document.getElementById('summary-symptoms-list').innerText = compiledSymptomData.symptoms;
-            document.getElementById('summary-duration-display').innerText = compiledSymptomData.duration;
-            document.getElementById('summary-assessment-text').innerHTML = `
-                <p class="mb-2">${compiledSymptomData.assessment}</p>
-                <p class="text-xs text-slate-400 font-medium">This triage logic leverages informational maps mapped out by our high school prototyping framework to direct you to relevant, appropriate care.</p>
-            `;
-
-            severityScore.innerText = `${compiledSymptomData.severity} / 10`;
-
-            // Color coordinate according to risk levels
-            if (compiledSymptomData.level === 'RED') {
-                banner.className = "p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-red-500 bg-red-950/40 text-red-200";
-                badgeIconContainer.className = "w-12 h-12 rounded-xl bg-red-500/20 border border-red-500 text-red-400 flex items-center justify-center text-xl";
-                badgeIconContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
-                urgencyTitle.innerText = "RED – Seek Urgent Care";
-                urgencyTitle.className = "text-xl font-extrabold text-red-400";
-                urgencySubtitle.className = "text-[10px] font-black uppercase tracking-widest text-red-300 block";
-            } else if (compiledSymptomData.level === 'YELLOW') {
-                banner.className = "p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-brand-yellow bg-brand-yellow/10 text-brand-yellow";
-                badgeIconContainer.className = "w-12 h-12 rounded-xl bg-brand-yellow/20 border border-brand-yellow text-brand-yellow flex items-center justify-center text-xl";
-                badgeIconContainer.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
-                urgencyTitle.innerText = "YELLOW – Consider Medical Consult";
-                urgencyTitle.className = "text-xl font-extrabold text-brand-yellow";
-                urgencySubtitle.className = "text-[10px] font-black uppercase tracking-widest text-brand-yellow block";
-            } else {
-                banner.className = "p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-brand-accent bg-brand-accent/5 text-slate-200";
-                badgeIconContainer.className = "w-12 h-12 rounded-xl bg-brand-accent/20 border border-brand-accent text-brand-accent flex items-center justify-center text-xl";
-                badgeIconContainer.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
-                urgencyTitle.innerText = "GREEN – General Care / Self-Care";
-                urgencyTitle.className = "text-xl font-extrabold text-brand-accent";
-                urgencySubtitle.className = "text-[10px] font-black uppercase tracking-widest text-brand-accent block";
-            }
-
-            navigateTo('summary');
-        }
-
-        // DOCTORS RENDERING & FILTERS
-        function renderDoctorsList(filterSpecialty = 'all', searchKeyword = '') {
-            const grid = document.getElementById('doctors-cards-grid');
-            grid.innerHTML = '';
-
-            const filteredDocs = doctorsData.filter(doc => {
-                const matchesSpecialty = (filterSpecialty === 'all' || doc.specialty === filterSpecialty);
-                const matchesSearch = doc.name.toLowerCase().includes(searchKeyword.toLowerCase()) || 
-                                      doc.bio.toLowerCase().includes(searchKeyword.toLowerCase());
-                return matchesSpecialty && matchesSearch;
-            });
-
-            filteredDocs.forEach(doc => {
-                const card = document.createElement('div');
-                card.className = "glass-card p-6 rounded-2xl flex flex-col justify-between space-y-5";
-                card.innerHTML = `
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="bg-brand-dark border border-brand-border px-3 py-1 rounded-lg text-[10px] font-black text-brand-accent uppercase tracking-widest">${doc.specialty}</span>
-                            <span class="text-xs text-brand-yellow font-bold"><i class="fa-solid fa-star"></i> ${doc.rating} Rating</span>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-brand-accent/10 border-2 border-brand-border flex items-center justify-center text-brand-accent text-xl">
-                                <i class="fa-solid ${doc.img}"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-base font-extrabold text-white leading-tight">${doc.name}</h3>
-                                <span class="text-xs text-slate-450">${doc.experience} Experience</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed">${doc.bio}</p>
-                    </div>
-
-                    <div class="pt-4 border-t border-brand-border space-y-3">
-                        <div class="flex items-center justify-between text-xs text-slate-400">
-                            <span>Available slots:</span>
-                            <span class="font-bold text-slate-200">${doc.availability}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs text-slate-400 pb-2">
-                            <span>Consult Fee:</span>
-                            <span class="font-bold text-white text-sm">${doc.fee}</span>
-                        </div>
-                        <button onclick="initiateAppointmentBooking('${doc.id}')" class="w-full bg-brand-dark hover:bg-brand-accent hover:text-brand-dark border-2 border-brand-border hover:border-brand-accent text-slate-200 text-xs font-bold py-2.5 rounded-xl transition-all text-center flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-calendar-plus"></i> Select & Book slot
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function filterDoctorSpecialty(specialty) {
-            // Update selected style on buttons
-            const buttons = document.querySelectorAll('.specialty-filter-btn');
-            buttons.forEach(btn => {
-                if (btn.innerText.toLowerCase().includes(specialty.toLowerCase().split(' ')[0]) || (specialty === 'all' && btn.innerText.includes('All'))) {
-                    btn.className = "specialty-filter-btn px-4 py-2 bg-brand-accent text-brand-dark text-xs font-bold rounded-lg border border-brand-accent transition-all";
-                } else {
-                    btn.className = "specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all";
-                }
-            });
-            renderDoctorsList(specialty, document.getElementById('search-doctor-input').value);
-        }
-
-        function filterDoctors() {
-            const keyword = document.getElementById('search-doctor-input').value;
-            renderDoctorsList('all', keyword);
-        }
-
-        // DIRECT FROM DIAGNOSTIC TO THE RELEVANT CLINICIAN
-        function autoDirectToDoctorBooking() {
-            // Match diagnostic results to relevant doctor
-            let matchedDocId = 'doc-1'; // Default General Doc
-            if (compiledSymptomData.symptoms.toLowerCase().includes('heart') || compiledSymptomData.symptoms.toLowerCase().includes('chest')) {
-                matchedDocId = 'doc-2'; // Cardiologist
-            } else if (compiledSymptomData.symptoms.toLowerCase().includes('throat') || compiledSymptomData.symptoms.toLowerCase().includes('cold')) {
-                matchedDocId = 'doc-1'; // GP
-            } else if (compiledSymptomData.symptoms.toLowerCase().includes('migraine') || compiledSymptomData.symptoms.toLowerCase().includes('headache')) {
-                matchedDocId = 'doc-1'; // GP
-            }
-            initiateAppointmentBooking(matchedDocId);
-        }
-
-        // INITIATE BOOKING FLOW
-        function initiateAppointmentBooking(doctorId) {
-            const docObj = doctorsData.find(d => d.id === doctorId);
-            if (!docObj) return;
-
-            selectedDoctor = docObj;
-
-            // Render Doctor Mini Profile header in Booking Panel
-            const header = document.getElementById('booking-doctor-header');
-            header.innerHTML = `
-                <div class="w-12 h-12 bg-brand-accent/20 rounded-xl flex items-center justify-center text-brand-accent text-xl">
-                    <i class="fa-solid ${selectedDoctor.img}"></i>
-                </div>
-                <div>
-                    <h4 class="text-sm font-black text-white">${selectedDoctor.name}</h4>
-                    <span class="text-[10px] text-brand-accent font-extrabold uppercase tracking-widest block">${selectedDoctor.specialty}</span>
-                    <span class="text-[10px] text-slate-400 block">${selectedDoctor.experience} Exp • Mock Consultation Fee: ${selectedDoctor.fee}</span>
-                </div>
-            `;
-
-            navigateTo('book');
-        }
-
-        // HANDLE APPOINTMENT RESERVATIONS SUBMITS
-        function handleBookingFormSubmit(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('booking-patient-name').value;
-            const date = document.getElementById('booking-date').value;
-            const time = document.getElementById('booking-time').value;
-            const channel = document.getElementById('booking-channel').value;
-            const notes = document.getElementById('booking-notes').value || "No baseline follow-up notes inputted.";
-
-            const bookingID = "MED-AI-" + Math.floor(100000 + Math.random() * 900000);
-
-            const newBooking = {
-                id: bookingID,
-                doctor: selectedDoctor,
-                patientName: name,
-                date: date,
-                time: time,
-                channel: channel,
-                notes: notes,
-                status: 'Confirmed'
-            };
-
-            // Store in simulated dynamic array
-            appointments.unshift(newBooking);
-            updateDashboardCounters();
-            renderAppointmentsDashboard();
-
-            // Populate confirmation receipt details
-            const receipt = document.getElementById('booking-receipt-box');
-            receipt.innerHTML = `
-                <div class="flex justify-between items-center border-b border-brand-border pb-3 flex-wrap gap-2">
-                    <div>
-                        <span class="text-[10px] text-slate-500 font-bold block">RESERVATION REFERENCE ID</span>
-                        <span class="text-sm font-extrabold text-brand-accent">${bookingID}</span>
-                    </div>
-                    <span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] px-2.5 py-0.5 rounded font-black uppercase tracking-wider">Confirmed</span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <span class="text-slate-450 block">Assigned Specialist:</span>
-                        <span class="font-extrabold text-white">${selectedDoctor.name}</span>
-                        <span class="text-[10px] text-brand-accent block">${selectedDoctor.specialty}</span>
-                    </div>
-                    <div>
-                        <span class="text-slate-450 block">Patient Name:</span>
-                        <span class="font-extrabold text-white">${name}</span>
-                    </div>
-                    <div>
-                        <span class="text-slate-450 block">Schedule Date:</span>
-                        <span class="font-extrabold text-white">${date}</span>
-                    </div>
-                    <div>
-                        <span class="text-slate-450 block">Assigned Time Slot:</span>
-                        <span class="font-extrabold text-white">${time}</span>
-                    </div>
-                </div>
-
-                <div class="border-t border-brand-border pt-3 text-xs">
-                    <span class="text-slate-450 block">Consultation delivery format:</span>
-                    <span class="font-bold text-slate-200"><i class="fa-solid fa-circle-nodes text-brand-accent mr-1"></i> ${channel}</span>
-                </div>
-            `;
-
-            navigateTo('confirmation');
-        }
-
-        // RENDERING SYSTEM DASHBOARD
-        function renderAppointmentsDashboard() {
-            const tbody = document.getElementById('dashboard-appointments-tbody');
-            const emptyState = document.getElementById('dashboard-empty-state');
-            
-            tbody.innerHTML = '';
-
-            if (appointments.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            appointments.forEach(app => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-900 transition-colors";
-                row.innerHTML = `
-                    <td class="p-4 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
-                            <i class="fa-solid ${app.doctor.img}"></i>
-                        </div>
-                        <div>
-                            <span class="font-bold text-white block">${app.doctor.name}</span>
-                            <span class="text-[10px] text-slate-400 block">${app.doctor.specialty}</span>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <span class="text-slate-300 font-medium">${app.channel}</span>
-                    </td>
-                    <td class="p-4">
-                        <span class="font-bold text-white block">${app.date}</span>
-                        <span class="text-[10px] text-slate-450 block">${app.time}</span>
-                    </td>
-                    <td class="p-4 text-center">
-                        <span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider inline-block">Active</span>
-                    </td>
-                    <td class="p-4 text-right">
-                        <button onclick="cancelAppointment('${app.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Cancel Reservation</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // CANCEL AN APPOINTMENT
-        function cancelAppointment(id) {
-            if (confirm("Are you sure you want to cancel this mock reservation?")) {
-                appointments = appointments.filter(a => a.id !== id);
-                updateDashboardCounters();
-                renderAppointmentsDashboard();
-            }
-        }
-
-        // UPDATE SYSTEM COUNTERS
-        function updateDashboardCounters() {
-            document.getElementById('dashboard-total-appointments').innerText = `${appointments.length} Appointments`;
-            document.getElementById('dashboard-total-consultations').innerText = `${completedConsultCount} Runs`;
-        }
-    </script>
+  function loadData(){
+    let stored=JSON.parse(localStorage.getItem("civicvoiceComplaints")||"null");
+    complaints=stored||baseComplaints;
+    document.body.classList.toggle("dark",localStorage.getItem("civicvoiceTheme")==="dark");
+    updateThemeLabels();
+  }
+  function saveData(){localStorage.setItem("civicvoiceComplaints",JSON.stringify(complaints))}
+  function goPage(page){
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById(page).classList.add("active");
+    document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+    document.getElementById("topTitle").textContent=pageMeta[page][0];document.getElementById("topSub").textContent=pageMeta[page][1];
+    document.getElementById("sidebar").classList.remove("open");window.scrollTo({top:0,behavior:"smooth"});
+    if(page==="dashboard")renderDashboard();if(page==="complaints")renderMyComplaints();if(page==="community")renderCommunity();if(page==="map")renderMap();
+  }
+  document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.onclick=()=>goPage(b.dataset.page));
+  function toggleMenu(){document.getElementById("sidebar").classList.toggle("open")}
+  function toggleTheme(){document.body.classList.toggle("dark");localStorage.setItem("civicvoiceTheme",document.body.classList.contains("dark")?"dark":"light");updateThemeLabels()}
+  function updateThemeLabels(){let dark=document.body.classList.contains("dark");document.getElementById("themeText").textContent=dark?"Light mode":"Dark mode";document.getElementById("themeIcon").textContent=dark?"☀":"◐"}
+  function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+  function statusName(s){return {submitted:"Submitted",review:"Under Review",progress:"In Progress",resolved:"Resolved"}[s]}
+  function statusClass(s){return `status ${s}`}
+  function tone(c){return ({Streetlight:"#fff0c9",Road:"#e2edff",Water:"#d9f5ff",Drainage:"#d9f6ec","Public Property":"#eee6ff",Traffic:"#fff0dd","Public Facility":"#dff4ea",Other:"#edf0f6"})[c]||"#e2edff"}
+  function renderDashboard(){
+    let mine=complaints.filter(x=>x.id.includes("1038")||x.id.includes("1031")||x.id.includes("1019")||x.user);
+    const count=s=>mine.filter(x=>x.status===s).length;
+    document.getElementById("stats").innerHTML=[
+      ["Total complaints",mine.length,"▦","#e5efff","All reports"],
+      ["Pending",count("submitted")+count("review"),"◌","#fff2d9","Needs review"],
+      ["In progress",count("progress"),"↻","#ddf4ff","Being addressed"],
+      ["Resolved",count("resolved"),"✓","#ddf8eb","Issues completed"]
+    ].map(x=>`<div class="stat-card" style="--tone:${x[3]}"><div class="stat-top"><span>${x[0]}</span><span class="stat-icon">${x[2]}</span></div><div class="stat-num">${x[1]}</div><div class="stat-foot">${x[4]}</div></div>`).join("");
+    const nums=[8,14,10,18,12,22,16],days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    document.getElementById("chartBars").innerHTML=nums.map((n,i)=>`<div class="bar-group"><div class="bar" style="height:${n/22*100}%"></div><span>${days[i]}</span></div>`).join("");
+    document.getElementById("recentList").innerHTML=complaints.slice(0,4).map(rowHTML).join("");
+    document.querySelectorAll("#recentList .list-row").forEach((el,i)=>el.onclick=()=>openDetail(complaints[i].id));
+  }
+  function rowHTML(c){return `<div class="list-row"><div class="cat-icon" style="--tone:${tone(c.category)}">${c.icon||catIcons[c.category]}</div><div class="row-main"><div class="row-title">${esc(c.title)}</div><div class="row-meta">${esc(c.location)} · ${c.date}</div></div><span class="${statusClass(c.status)}">${statusName(c.status)}</span></div>`}
+  function setupPhoto(){
+    const input=document.getElementById("photoInput"),zone=document.getElementById("dropzone");
+    input.onchange=e=>readPhoto(e.target.files[0]);["dragover","dragleave","drop"].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();if(evt==="dragover")zone.classList.add("drag");else zone.classList.remove("drag");if(evt==="drop")readPhoto(e.dataTransfer.files[0])}));
+  }
+  function readPhoto(file){if(!file||!file.type.startsWith("image/"))return showToast("Please choose an image file");let r=new FileReader();r.onload=e=>{photoData=e.target.result;let p=document.getElementById("photoPreview");p.src=photoData;p.style.display="block";showToast("Photo added successfully","success")};r.readAsDataURL(file)}
+  function detect(text,category){
+    let t=text.toLowerCase(), cat=category;
+    const rules=[["streetlight","Streetlight"],["light","Streetlight"],["pothole","Road"],["road","Road"],["water","Water"],["leak","Water"],["drain","Drainage"],["bench","Public Property"],["property","Public Property"],["traffic","Traffic"],["signal","Traffic"],["park","Public Facility"]];
+    if(!cat){let found=rules.find(r=>t.includes(r[0]));cat=found?found[1]:"Other"} let priority=/unsafe|danger|accident|flood|large|urgent|broken/.test(t)?"High":(/week|leak|block/.test(t)?"Medium":"Low");
+    const dept={Road:"Roads & Transport Department",Streetlight:"Electrical Maintenance Department",Water:"Water Supply Department","Public Property":"Parks & Public Spaces Department",Drainage:"Sanitation & Drainage Department",Traffic:"Traffic Management Department","Public Facility":"Public Facilities Department",Other:"Municipal Services Department"}[cat];
+    return {cat,priority,dept};
+  }
+  function startAnalysis(){
+    let desc=document.getElementById("description").value.trim(),loc=document.getElementById("location").value.trim(),cat=document.getElementById("category").value;
+    if(!desc||!loc||!cat){showToast("Please add a description, location, and category.");return}
+    let d=detect(desc,cat);generated={category:d.cat,description:`CivicVoice report: ${desc.charAt(0).toUpperCase()+desc.slice(1).replace(/\.*$/,".")}`,location:loc,priority:d.priority,department:d.dept};
+    reportStep=2;showPane(2);document.getElementById("analysisContent").innerHTML=`<div class="ai-loading"><div class="ai-orb"></div><h2>Civic AI is analyzing your report</h2><p class="muted" style="font-size:13px">Identifying category, urgency and the right department…</p></div>`;
+    setTimeout(renderAnalysis,1100);
+  }
+  function renderAnalysis(){document.getElementById("analysisContent").innerHTML=`<h2>AI-organized complaint</h2><p class="muted" style="font-size:13px">Review and edit the generated information before it is sent.</p><div class="analysis-box"><div class="analysis-title">✦ CIVIC AI ANALYSIS COMPLETE</div><div class="summary-grid"><div class="summary-item"><small>Detected category</small><b>${generated.category}</b></div><div class="summary-item"><small>Priority level</small><b>${generated.priority}</b></div><div class="summary-item"><small>Responsible department</small><b>${generated.department}</b></div><div class="summary-item"><small>Location</small><b>${esc(generated.location)}</b></div></div></div><div class="field"><label>Professional complaint description</label><textarea id="generatedDesc">${esc(generated.description)}</textarea></div><div class="form-grid"><div class="field"><label>Location</label><input id="generatedLoc" value="${esc(generated.location)}"></div><div class="field"><label>Priority</label><select id="generatedPriority"><option ${generated.priority==="Low"?"selected":""}>Low</option><option ${generated.priority==="Medium"?"selected":""}>Medium</option><option ${generated.priority==="High"?"selected":""}>High</option></select></div></div><div class="form-actions"><button class="btn btn-secondary" onclick="showPane(1)">← Edit original details</button><button class="btn btn-primary" onclick="confirmSubmit()">Submit complaint →</button></div>`}
+  function showPane(n){reportStep=n;document.querySelectorAll(".form-pane").forEach(x=>x.classList.remove("active"));document.getElementById("pane"+n).classList.add("active");document.querySelectorAll(".step").forEach((x,i)=>{x.classList.toggle("on",i===n-1);x.classList.toggle("done",i<n-1)})}
+  function confirmSubmit(){generated.description=document.getElementById("generatedDesc").value;generated.location=document.getElementById("generatedLoc").value;generated.priority=document.getElementById("generatedPriority").value;openConfirm("Submit your complaint?","Your report will be shared with the suggested responsible department.",submitReport)}
+  function openConfirm(title,text,fn){document.getElementById("confirmTitle").textContent=title;document.getElementById("confirmText").textContent=text;document.getElementById("confirmYes").onclick=()=>{closeConfirm();fn()};document.getElementById("confirmModal").classList.add("open")}
+  function closeConfirm(){document.getElementById("confirmModal").classList.remove("open")}
+  function submitReport(){
+    let max=Math.max(...complaints.map(x=>+x.id.split("-").pop()));let id="CV-2026-"+String(max+1).padStart(4,"0");
+    let c={id,category:generated.category,title:generated.description.replace("CivicVoice report: ","").slice(0,62)+(generated.description.length>62?"…":""),description:generated.description,location:generated.location,date:"Mar 18, 2026",status:"submitted",priority:generated.priority,department:generated.department,support:0,icon:catIcons[generated.category],pos:[42,54],updates:["Submitted by you just now","Report received by CivicVoice","Pending authority assignment"],user:true,photo:photoData};
+    complaints.unshift(c);saveData();document.getElementById("successId").textContent=id;showPane(3);showToast(`Complaint ${id} submitted successfully!`,"success");
+  }
+  function newReport(){document.getElementById("description").value="";document.getElementById("location").value="";document.getElementById("category").value="";document.getElementById("photoPreview").style.display="none";photoData="";showPane(1)}
+  function voiceInput(){let b=document.getElementById("voiceBtn"),hint=document.getElementById("voiceHint");b.classList.add("listening");hint.textContent="Listening… (demo voice input)";setTimeout(()=>{b.classList.remove("listening");document.getElementById("description").value="The streetlight near the bus stop has been broken for two weeks and the area is unsafe at night.";hint.textContent="Voice captured! You can edit the transcription.";if(!document.getElementById("category").value)document.getElementById("category").value="Streetlight";showToast("Voice note transcribed","success")},1300)}
+  function renderMyComplaints(){
+    let q=document.getElementById("mySearch").value.toLowerCase(),cat=document.getElementById("myCategory").value,stat=document.getElementById("myStatus").value;
+    let items=complaints.filter(c=>(c.user||["CV-2026-1038","CV-2026-1031","CV-2026-1019"].includes(c.id))&&(!q||`${c.id} ${c.title} ${c.location}`.toLowerCase().includes(q))&&(!cat||c.category===cat)&&(!stat||c.status===stat));
+    let el=document.getElementById("myList");el.innerHTML=items.length?items.map(c=>`<div class="complaint-item" onclick="openDetail('${c.id}')"><div class="id-text">${c.id}</div><div><b>${c.icon||catIcons[c.category]} ${esc(c.category)}</b><br><small class="muted">${esc(c.title)}</small></div><div>${c.date}</div><div>${esc(c.location)}</div><div><span class="${statusClass(c.status)}">${statusName(c.status)}</span></div><div><span class="priority ${c.priority.toLowerCase()}">${c.priority}</span></div></div>`).join(""):`<div class="empty">⌕<b>No complaints found</b>Try changing your search or filters.</div>`;
+  }
+  function renderCommunity(){
+    let q=document.getElementById("communitySearch").value.toLowerCase(),cat=document.getElementById("communityCat").value,sort=document.getElementById("communitySort").value;
+    let arr=complaints.filter(c=>(!q||`${c.title} ${c.location} ${c.category}`.toLowerCase().includes(q))&&(!cat||c.category===cat));if(sort==="support")arr.sort((a,b)=>b.support-a.support);
+    document.getElementById("communityFeed").innerHTML=arr.length?arr.map(c=>`<article class="feed-item"><div class="feed-top"><div class="cat-icon" style="--tone:${tone(c.category)}">${c.icon||catIcons[c.category]}</div><div class="row-main"><div class="feed-title" onclick="openDetail('${c.id}')">${esc(c.title)}</div><div class="row-meta">${esc(c.location)} · ${c.date} · ${c.category}</div></div><span class="${statusClass(c.status)}">${statusName(c.status)}</span></div><p class="feed-desc">${esc(c.description)}</p><div class="feed-footer"><span class="priority ${c.priority.toLowerCase()}">${c.priority} priority</span><button class="support-btn ${c.supported?'active':''}" onclick="support('${c.id}')">${c.supported?"✓ Supported":"↑ Support"} <b>${c.support}</b></button></div></article>`).join(""):`<div class="empty">◉<b>No community reports found</b>Try another search or category.</div>`;
+  }
+  function support(id){let c=complaints.find(x=>x.id===id);c.supported=!c.supported;c.support+=c.supported?1:-1;saveData();renderCommunity();showToast(c.supported?"Your support was added — thank you!":"Support removed")}
+  function openDetail(id){
+    let c=complaints.find(x=>x.id===id);if(!c)return;document.getElementById("modalTitle").textContent=`Complaint ${c.id}`;
+    let stages=["Submitted","Under Review","In Progress","Resolved"],current=["submitted","review","progress","resolved"].indexOf(c.status);
+    document.getElementById("modalBody").innerHTML=`<div class="detail-photo">${c.photo?`<img src="${c.photo}" alt="Uploaded issue photo">`:(c.icon||catIcons[c.category])}</div><div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><h2 style="font-size:19px">${esc(c.title)}</h2><span class="${statusClass(c.status)}">${statusName(c.status)}</span></div><span class="priority ${c.priority.toLowerCase()}">${c.priority} priority</span></div><p style="font-size:13px;line-height:1.6;margin:15px 0">${esc(c.description)}</p><div class="detail-grid"><div><small>Location</small><b>${esc(c.location)}</b></div><div><small>Responsible department</small><b>${esc(c.department)}</b></div><div><small>Submission date</small><b>${c.date}</b></div><div><small>Community support</small><b>↑ ${c.support} supporters</b></div></div><h3>Status timeline</h3><div class="timeline">${stages.map((s,i)=>`<div class="timeline-item ${i<current?"done":i===current?"current":""}"><span class="time-dot"></span><div><b>${s}</b><br><small class="muted">${i<=current?(c.updates[i]||"Status updated by CivicVoice"):"Awaiting next update"}</small></div></div>`).join("")}</div>${!c.user?`<button class="btn btn-secondary" onclick="support('${c.id}');closeModal()">↑ Support this issue (${c.support})</button>`:""}</div>`;
+    document.getElementById("detailModal").classList.add("open");
+  }
+  function closeModal(){document.getElementById("detailModal").classList.remove("open")}
+  function renderMap(){
+    const cat=document.getElementById("mapCat").value,canvas=document.getElementById("mapCanvas");canvas.querySelectorAll(".marker").forEach(x=>x.remove());canvas.querySelector("#mapPopup").classList.remove("on");
+    complaints.filter(c=>!cat||c.category===cat).forEach(c=>{let b=document.createElement("button");b.className="marker";b.style.left=c.pos[0]+"%";b.style.top=c.pos[1]+"%";b.style.setProperty("--marker",c.status==="resolved"?"var(--green)":c.priority==="High"?"var(--red)":"var(--blue)");b.innerHTML=`<span>${c.icon||catIcons[c.category]}</span>`;b.onclick=()=>mapInfo(c,b);canvas.appendChild(b)});
+  }
+  function mapInfo(c,b){let p=document.getElementById("mapPopup");p.innerHTML=`<button style="float:right;background:none;color:var(--muted)" onclick="document.getElementById('mapPopup').classList.remove('on')">×</button><h3>${esc(c.title)}</h3><p class="muted" style="font-size:11px;margin:6px 0">${esc(c.location)}</p><span class="${statusClass(c.status)}">${statusName(c.status)}</span><button class="btn btn-primary" style="font-size:11px;padding:7px 9px;float:right" onclick="openDetail('${c.id}')">View details</button>`;p.style.left=Math.min(b.offsetLeft+38,document.getElementById("mapCanvas").clientWidth-265)+"px";p.style.top=Math.max(b.offsetTop-20,15)+"px";p.classList.add("on")}
+  function mapZoom(d){zoom=Math.max(.8,Math.min(1.25,zoom+d*.1));document.getElementById("mapCanvas").style.backgroundSize=`${190*zoom}px ${140*zoom}px,${240*zoom}px ${190*zoom}px,${70*zoom}px ${70*zoom}px`;showToast(`Map zoom ${Math.round(zoom*100)}%`)}
+  function toggleNotifications(){document.getElementById("notifications").classList.toggle("open")}
+  function markRead(){document.querySelector(".dot").style.display="none";showToast("All notifications marked as read","success")}
+  function toggleAssistant(){document.getElementById("assistantPanel").classList.toggle("open")}
+  function assistantSend(){
+    let input=document.getElementById("assistantText"),text=input.value.trim();if(!text)return;let chat=document.getElementById("chat");chat.innerHTML+=`<div class="bubble user">${esc(text)}</div>`;input.value="";chat.scrollTop=chat.scrollHeight;
+    setTimeout(()=>{let a=detect(text,""),loc=(text.match(/(?:near|at|on|by)\s+([^,.]+)/i)||[])[1]||"Location to be confirmed";let desc=`${text.charAt(0).toUpperCase()+text.slice(1).replace(/\.*$/,".")}`;chat.innerHTML+=`<div class="bubble bot">I've organized that into a report:<div class="structured"><b>Category:</b> ${a.cat}<br><b>Location:</b> ${esc(loc)}<br><b>Priority:</b> ${a.priority}<br><b>Department:</b> ${a.dept}<br><br><b>Description:</b> ${esc(desc)}</div><button class="btn btn-primary" style="font-size:11px;padding:7px 9px;margin-top:9px" onclick="useAssistantReport('${encodeURIComponent(text)}','${a.cat}','${encodeURIComponent(loc)}')">Use this report →</button></div>`;chat.scrollTop=chat.scrollHeight},550)
+  }
+  function useAssistantReport(encoded,cat,loc){goPage("report");document.getElementById("description").value=decodeURIComponent(encoded);document.getElementById("category").value=cat;document.getElementById("location").value=decodeURIComponent(loc)==="Location to be confirmed"?"":decodeURIComponent(loc);toggleAssistant();showToast("AI draft added to your report","success")}
+  function showToast(msg,type=""){let e=document.createElement("div");e.className="toast "+type;e.textContent=msg;document.getElementById("toasts").appendChild(e);setTimeout(()=>e.remove(),3300)}
+  document.getElementById("detailModal").addEventListener("click",e=>{if(e.target.id==="detailModal")closeModal()});document.getElementById("confirmModal").addEventListener("click",e=>{if(e.target.id==="confirmModal")closeConfirm()});
+  loadData();setupPhoto();renderDashboard();renderMyComplaints();renderCommunity();renderMap();
+</script>
 </body>
 </html>
-```
