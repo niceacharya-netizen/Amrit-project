@@ -1,0 +1,1661 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediAI – AI Doctor Consultation Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#090D16',
+                            card: '#131A2C',
+                            border: '#242F48',
+                            accent: '#10B981', // Neon Emerald
+                            accentHover: '#059669',
+                            blue: '#3B82F6',
+                            red: '#EF4444',
+                            yellow: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090D16;
+            color: #F3F4F6;
+            overflow-x: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #242F48;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10B981;
+        }
+        /* Glassmorphism & High Contrast Borders */
+        .glass-card {
+            background: rgba(19, 26, 44, 0.75);
+            backdrop-filter: blur(12px);
+            border: 2px solid #242F48;
+            box-shadow: 6px 6px 0px 0px rgba(16, 185, 129, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: #10B981;
+            box-shadow: 6px 6px 0px 0px rgba(16, 185, 129, 0.3);
+            transform: translate(-2px, -2px);
+        }
+        .interactive-btn {
+            transition: all 0.2s ease-in-out;
+            box-shadow: 4px 4px 0px 0px #090D16;
+        }
+        .interactive-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px #10B981;
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Emergency Warning Banner -->
+    <div class="bg-red-950/80 border-b border-red-500/30 text-red-200 py-2.5 px-4 text-sm text-center font-medium sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center gap-4 flex-wrap">
+            <span class="flex items-center gap-2 mx-auto md:mx-0">
+                <i class="fa-solid fa-triangle-exclamation text-red-500 animate-pulse text-base"></i>
+                <span id="nav-emergency-banner"><strong>Immediate Medical Warning:</strong> If you are experiencing a severe emergency, please contact your local emergency services immediately.</span>
+            </span>
+            <span class="hidden md:inline-block bg-red-900/60 px-2.5 py-0.5 rounded text-xs border border-red-500/40 font-bold uppercase tracking-wide">Emergency Call: 102 (Demo Mode)</span>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="bg-brand-dark/95 border-b border-brand-border sticky top-[45px] z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" onclick="navigateTo('home')" class="flex items-center gap-3 group">
+                <div class="w-11 h-11 rounded-xl bg-brand-accent flex items-center justify-center text-brand-dark font-extrabold text-xl shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] transition-transform group-hover:scale-105">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black tracking-tight text-white block">Medi<span class="text-brand-accent text-glow">AI</span></span>
+                    <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase block -mt-1">Class 12 AI Prototype</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden lg:flex items-center gap-1">
+                <button onclick="navigateTo('home')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">Home</button>
+                <button onclick="navigateTo('consult')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-comment-medical text-brand-accent"></i> AI Consult</button>
+                <button onclick="navigateTo('doctors')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">Find Doctor</button>
+                <button onclick="navigateTo('dashboard')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-brand-accent"></i> Dashboard</button>
+                <button onclick="navigateTo('resources')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">Health Resources</button>
+                <button onclick="navigateTo('about')" class="px-4 py-2 rounded-lg font-bold text-sm text-slate-300 hover:text-white transition-colors">About Project</button>
+            </nav>
+
+            <!-- Action Area (Language Toggle, Dashboard Icon, Call-to-Action) -->
+            <div class="hidden lg:flex items-center gap-4">
+                <!-- Language Switcher Button -->
+                <button onclick="toggleLanguage()" id="lang-switch-btn" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border hover:border-brand-accent px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-language text-base text-brand-accent"></i>
+                    <span>नेपाली / EN</span>
+                </button>
+
+                <!-- Patient Profile Widget -->
+                <button onclick="openPatientProfileModal()" class="w-10 h-10 rounded-full bg-slate-800 border-2 border-brand-border flex items-center justify-center text-slate-300 hover:border-brand-accent transition-colors relative" title="View Patient Profile">
+                    <i class="fa-solid fa-user-astronaut text-base"></i>
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-brand-accent border-2 border-brand-dark rounded-full"></span>
+                </button>
+
+                <!-- Start Consult CTA -->
+                <button onclick="navigateTo('consult')" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-5 py-2.5 rounded-xl text-sm transition-all shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
+                    Consult Now
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button onclick="toggleMobileMenu()" class="lg:hidden w-11 h-11 rounded-lg border-2 border-brand-border flex items-center justify-center text-slate-200">
+                <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation Menu Dropdown -->
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-brand-border bg-brand-dark px-4 py-6 space-y-3">
+            <button onclick="navigateTo('home'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">Home</button>
+            <button onclick="navigateTo('consult'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-comment-medical text-brand-accent mr-2"></i> AI Consultation</button>
+            <button onclick="navigateTo('doctors'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">Find Doctor</button>
+            <button onclick="navigateTo('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-calendar-check text-brand-accent mr-2"></i> Patient Dashboard</button>
+            <button onclick="navigateTo('resources'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">Health Resources</button>
+            <button onclick="navigateTo('about'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-bold text-slate-200 hover:bg-slate-800 transition-colors">About Project</button>
+            <div class="border-t border-brand-border pt-4 flex items-center justify-between gap-4">
+                <button onclick="toggleLanguage(); toggleMobileMenu()" class="flex-1 bg-brand-card hover:bg-slate-800 border border-brand-border px-3 py-2 rounded-lg text-sm font-bold text-slate-300 text-center">
+                    Switch to नेपाली
+                </button>
+                <button onclick="openPatientProfileModal(); toggleMobileMenu()" class="bg-brand-card hover:bg-slate-800 border border-brand-border p-2 rounded-lg text-slate-300 text-center flex items-center justify-center gap-2 flex-1 text-sm font-bold">
+                    <i class="fa-solid fa-user-astronaut"></i> Profile
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow">
+
+        <!-- SECTION: HOME -->
+        <section id="section-home" class="py-12 md:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+            <!-- Hero Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center gap-2.5 bg-brand-accent/10 border-2 border-brand-accent/30 text-brand-accent py-1.5 px-3.5 rounded-full text-xs font-extrabold tracking-wide uppercase">
+                        <span class="w-2.5 h-2.5 bg-brand-accent rounded-full animate-ping"></span>
+                        Nepal's First AI Health Assistant Prototype
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] text-white">
+                        Medi<span class="text-brand-accent text-glow">AI</span> – Intelligent Health Assistant
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-300 font-medium max-w-2xl leading-relaxed" id="hero-subtitle">
+                        Understand your health concerns, find key informational guides, and seamlessly discover optimal next steps with our next-generation diagnostic assistant framework.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                        <button onclick="navigateTo('consult')" class="interactive-btn bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-8 py-4 rounded-xl text-base text-center transition-all flex items-center justify-center gap-2.5">
+                            <i class="fa-solid fa-notes-medical text-lg"></i>
+                            <span id="hero-btn-primary">Start AI Consultation</span>
+                        </button>
+                        <button onclick="navigateTo('doctors')" class="interactive-btn bg-brand-card hover:bg-slate-850 text-slate-200 border-2 border-brand-border hover:border-brand-accent font-extrabold px-8 py-4 rounded-xl text-base text-center transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span id="hero-btn-secondary">Find a Demo Doctor</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-4 text-slate-400 text-xs font-semibold pt-4 border-t border-brand-border max-w-xl">
+                        <span class="flex items-center gap-1.5 text-brand-accent">
+                            <i class="fa-solid fa-shield-halved text-sm"></i> Secure Sandbox
+                        </span>
+                        <span>•</span>
+                        <span>Educational Concept Tool</span>
+                        <span>•</span>
+                        <span>No Real Prescriptions</span>
+                    </div>
+                </div>
+                <!-- Interactive Dashboard Hero Card/Art -->
+                <div class="lg:col-span-5 relative">
+                    <div class="absolute -inset-1.5 bg-gradient-to-r from-brand-accent to-brand-blue rounded-3xl blur opacity-30 animate-pulse"></div>
+                    <div class="relative bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-6">
+                        <div class="flex items-center justify-between border-b border-brand-border pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-brand-accent/20 rounded-lg flex items-center justify-center text-brand-accent">
+                                    <i class="fa-solid fa-robot text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">MediAI Assistant v2.0</h4>
+                                    <span class="text-[10px] text-brand-accent font-semibold tracking-wider uppercase block">System Active</span>
+                                </div>
+                            </div>
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-accent animate-pulse"></span>
+                        </div>
+                        <!-- Mini Simulation Visual -->
+                        <div class="space-y-3.5">
+                            <div class="bg-brand-dark/80 p-3.5 rounded-xl border border-brand-border text-xs text-slate-300">
+                                <span class="font-bold text-brand-accent block mb-1">User Symptom Statement</span>
+                                "I have had a mild headache and persistent dry cough for the last three days."
+                            </div>
+                            <div class="bg-brand-accent/5 p-3.5 rounded-xl border border-brand-accent/30 text-xs text-slate-300 relative">
+                                <span class="font-bold text-brand-accent flex items-center gap-1.5 mb-1">
+                                    <i class="fa-solid fa-circle-info"></i> MediAI Educational Analyzer
+                                </span>
+                                "Analyzing timeline & risk vectors. Asking necessary triage queries: Are you experiencing shortness of breath or high fever?"
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 bg-brand-dark/60 p-3 rounded-lg border border-brand-border text-xs text-slate-400">
+                            <span>Primary Risk Level Index:</span>
+                            <span class="font-bold text-brand-yellow px-2 py-0.5 bg-brand-yellow/10 rounded border border-brand-yellow/30 uppercase tracking-widest text-[10px]">Moderate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards Section -->
+            <div class="space-y-8">
+                <div class="text-center max-w-3xl mx-auto space-y-2">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Key Platform Features</h2>
+                    <p class="text-slate-400 font-medium">Specially architected components detailing how conversational AI supports community primary triage protocols.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Feature 1 -->
+                    <div class="glass-card p-8 rounded-2xl space-y-4">
+                        <div class="w-12 h-12 bg-brand-accent/10 border-2 border-brand-accent/30 text-brand-accent rounded-xl flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_rgba(16,185,129,0.1)]">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Interactive AI Consultation</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Simulates expert-level primary triage, gathering details on symptoms, severity, and duration to generate comprehensive baseline health profiles.
+                        </p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="glass-card p-8 rounded-2xl space-y-4">
+                        <div class="w-12 h-12 bg-brand-blue/10 border-2 border-brand-blue/30 text-brand-blue rounded-xl flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_rgba(59,130,246,0.1)]">
+                            <i class="fa-solid fa-user-md"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Find Demo Doctors</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Filter specialty-vetted clinical profiles across key fields (Pediatrics, Cardiology, General Medicine, Dentistry) to schedule appropriate follow-ups.
+                        </p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="glass-card p-8 rounded-2xl space-y-4">
+                        <div class="w-12 h-12 bg-purple-500/10 border-2 border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_rgba(168,85,247,0.1)]">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Structured Dashboards</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Retrieve medical consultation reports, check real-time booking updates, and review educational symptom breakdowns on a simple layout.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How It Works Section -->
+            <div class="bg-brand-card/50 border-2 border-brand-border rounded-3xl p-8 md:p-12 space-y-12">
+                <div class="text-center max-w-2xl mx-auto space-y-2">
+                    <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Streamlined AI Workflow</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">How Consultation Assistant Works</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+                    <!-- Step 1 -->
+                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
+                        <span class="text-5xl font-black text-brand-accent/20 block">01</span>
+                        <h4 class="text-lg font-bold text-white">Describe Concern</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed">Input your direct complaints, major localized symptoms, or initial discomfort in the intuitive diagnostic pane.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
+                        <span class="text-5xl font-black text-brand-blue/20 block">02</span>
+                        <h4 class="text-lg font-bold text-white">Answer AI Diagnostics</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed">Respond to precise follow-up questions from the MediAI chatbot regarding symptom duration, pain profile, and triggers.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
+                        <span class="text-5xl font-black text-brand-yellow/20 block">03</span>
+                        <h4 class="text-lg font-bold text-white">Acquire General Info</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed">Receive custom summaries, educational reading tracks, and real-time guidance based on your risk stratification metrics.</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="space-y-3 relative z-10 bg-brand-card p-6 rounded-xl border-2 border-brand-border">
+                        <span class="text-5xl font-black text-red-500/20 block">04</span>
+                        <h4 class="text-lg font-bold text-white">Formulate Action Plan</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed">Identify matched local demographic practitioners, choose available schedules, and safely book instant follow-up visits.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Absolute Medical Disclaimer Banner -->
+            <div class="bg-slate-900 border-2 border-slate-750 p-6 md:p-8 rounded-2xl flex flex-col md:flex-row items-start gap-5">
+                <div class="bg-brand-yellow/10 border-2 border-brand-yellow/40 text-brand-yellow p-3 rounded-xl">
+                    <i class="fa-solid fa-circle-exclamation text-xl"></i>
+                </div>
+                <div class="space-y-2 flex-1">
+                    <h4 class="text-lg font-bold text-white">Critical Prototypic & Clinical Disclaimer</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        <strong>MediAI is an educational diagnostic web simulation</strong> created solely for high school demonstration purposes. This system is not engineered, licensed, or configured to prescribe treatments, diagnose conditions, issue prescriptions, or render real-time clinical decisions. Standard medical evaluations require full in-person dynamic evaluation by fully credentialed and licensed health practitioners. <strong>NEVER disregard certified medical expert feedback based on insights acquired here.</strong>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: AI CONSULTATION (CHAT SCREEN) -->
+        <section id="section-consult" class="hidden py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <!-- Header section of chatbot -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-card border-2 border-brand-border rounded-2xl p-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-brand-accent/10 border border-brand-accent text-brand-accent rounded-xl flex items-center justify-center text-2xl relative">
+                        <i class="fa-solid fa-robot"></i>
+                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-brand-card rounded-full"></span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            MediAI Core Diagnostic Engine
+                            <span class="bg-brand-accent/20 text-brand-accent text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Concept Engine</span>
+                        </h2>
+                        <span class="text-xs text-slate-400">Educational Health triage session simulator</span>
+                    </div>
+                </div>
+                <!-- Dynamic Urgency Meter Display inside Chat -->
+                <div class="flex items-center gap-2.5 bg-brand-dark px-4 py-2.5 rounded-xl border border-brand-border">
+                    <span class="text-xs text-slate-400 font-bold">Urgency Index:</span>
+                    <div id="urgency-pill-display" class="bg-slate-800 border border-slate-700 text-slate-300 px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider">
+                        Awaiting Inputs
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Grid (Left Sidebar with Quick Inputs, Right Chat Sandbox) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-[550px] md:h-[650px] items-stretch">
+                <!-- Left Sidebar: Patient Quick-Start presets -->
+                <div class="md:col-span-4 bg-brand-card border-2 border-brand-border rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-black tracking-widest text-slate-400 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-fire-flame-curved text-brand-accent"></i> Predefined Scenarios
+                        </h4>
+                        <p class="text-xs text-slate-400">Select one preset to simulate specific medical cases and evaluate dynamic alert protocols in action.</p>
+                        
+                        <div class="space-y-2">
+                            <button onclick="triggerSymptomScenario('chest_pain')" class="w-full text-left bg-brand-dark hover:bg-slate-800 border border-brand-border hover:border-red-500/50 p-3 rounded-xl transition-all group flex items-start gap-2.5">
+                                <span class="bg-red-500/10 text-red-400 p-1 rounded-md text-xs mt-0.5"><i class="fa-solid fa-heart-pulse"></i></span>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block group-hover:text-red-400">Emergency Chest Pain</span>
+                                    <span class="text-[10px] text-slate-400 block">Demonstrates immediate urgent RED indicators.</span>
+                                </div>
+                            </button>
+                            <button onclick="triggerSymptomScenario('migraine')" class="w-full text-left bg-brand-dark hover:bg-slate-800 border border-brand-border hover:border-brand-yellow/50 p-3 rounded-xl transition-all group flex items-start gap-2.5">
+                                <span class="bg-brand-yellow/10 text-brand-yellow p-1 rounded-md text-xs mt-0.5"><i class="fa-solid fa-brain"></i></span>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block group-hover:text-brand-yellow">Severe Throbbing Migraine</span>
+                                    <span class="text-[10px] text-slate-400 block">Demonstrates Moderate YELLOW triage guidelines.</span>
+                                </div>
+                            </button>
+                            <button onclick="triggerSymptomScenario('mild_cold')" class="w-full text-left bg-brand-dark hover:bg-slate-800 border border-brand-border hover:border-brand-accent/50 p-3 rounded-xl transition-all group flex items-start gap-2.5">
+                                <span class="bg-brand-accent/10 text-brand-accent p-1 rounded-md text-xs mt-0.5"><i class="fa-solid fa-virus"></i></span>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block group-hover:text-brand-accent">Common Mild Cold</span>
+                                    <span class="text-[10px] text-slate-400 block">Demonstrates Mild GREEN self-care alerts.</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Disclaimer Alert block -->
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                        <span class="text-[10px] font-bold text-brand-yellow uppercase tracking-widest block mb-1">Interactive Demo Notes</span>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Once diagnostic sequence reaches consensus, click the <strong>"Compile Diagnostic Summary"</strong> action toggle to review triage profiles.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Sandbox: Actual Conversational Panel -->
+                <div class="md:col-span-8 bg-brand-card border-2 border-brand-border rounded-2xl flex flex-col h-full overflow-hidden">
+                    <!-- Chat Messages Scrolling Area -->
+                    <div id="chat-messages-container" class="flex-grow p-5 overflow-y-auto space-y-4 flex flex-col justify-start">
+                        <!-- AI Introduction Message -->
+                        <div class="flex items-start gap-3 max-w-[85%] self-start">
+                            <div class="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center flex-shrink-0 text-sm">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="bg-brand-dark border border-brand-border px-4 py-3 rounded-2xl rounded-tl-none text-sm text-slate-200 space-y-2">
+                                <p>Namaste & Hello! I am your AI Diagnostic Assistant, programmed to gather baseline health details, guide symptom classification, and identify alert indicators.</p>
+                                <p class="text-xs text-brand-yellow font-bold"><i class="fa-solid fa-triangle-exclamation"></i> NOTE: I am a high school tech prototype and cannot prescribe medical treatments.</p>
+                                <p class="text-xs">How can I assist you today? Feel free to describe symptoms or select a predefined scenario from the left panel!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typing Indicator Spot -->
+                    <div id="typing-indicator" class="px-5 py-2 hidden text-xs text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-notch animate-spin text-brand-accent"></i>
+                        <span>AI Assistant formulating clinical assessment...</span>
+                    </div>
+
+                    <!-- Chat Message Input Controls -->
+                    <div class="p-4 border-t border-brand-border bg-brand-dark/90 flex flex-col gap-3">
+                        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
+                            <input type="text" id="chat-input" placeholder="Type your symptoms here (e.g., I have low fever and dry cough)..." class="flex-grow bg-brand-card border-2 border-brand-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent">
+                            <button type="submit" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark px-5 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                        
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <span class="text-[10px] text-slate-500"><i class="fa-solid fa-lock"></i> Sandbox simulation offline pipeline</span>
+                            <!-- Finish summary button (initially disabled/hidden, visible once chat interactions progress) -->
+                            <button onclick="compileSymptomSummary()" id="compile-summary-btn" class="bg-brand-blue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg border border-blue-400 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none transition-all flex items-center gap-1.5 animate-bounce">
+                                <i class="fa-solid fa-file-medical"></i> Compile Diagnostic Summary
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: CONSULTATION SUMMARY -->
+        <section id="section-summary" class="hidden py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 bg-brand-accent/10 border-2 border-brand-accent/40 text-brand-accent rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-file-waveform"></i>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">AI Generated Consultation Summary</h1>
+                <p class="text-slate-400 text-sm max-w-xl mx-auto">This structured educational overview encapsulates inputs parsed during AI interactive session protocols.</p>
+            </div>
+
+            <!-- Triage Report Grid -->
+            <div class="bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-6">
+                <!-- Headline Urgency Block -->
+                <div id="summary-urgency-banner" class="p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border">
+                    <div class="flex items-center gap-4 text-center md:text-left">
+                        <div id="summary-urgency-icon-container" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl">
+                            <!-- JS injected icon -->
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-widest block" id="summary-urgency-subtitle">Risk Classification Level</span>
+                            <h3 class="text-xl font-bold" id="summary-urgency-title">Moderate (Consider Consult)</h3>
+                        </div>
+                    </div>
+                    <div class="bg-brand-dark/50 px-4 py-2 rounded-xl border border-brand-border text-center">
+                        <span class="text-xs text-slate-400 block">Symptom Severity Index</span>
+                        <span class="text-sm font-extrabold text-white" id="summary-severity-score">6.5 / 10</span>
+                    </div>
+                </div>
+
+                <!-- Parsed Structured Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="bg-brand-dark p-5 rounded-2xl border border-brand-border space-y-2">
+                            <span class="text-xs font-extrabold text-brand-accent uppercase tracking-widest block"><i class="fa-solid fa-list-check"></i> Primary Symptoms Captured</span>
+                            <p class="text-sm text-slate-200" id="summary-symptoms-list">Persistent head pressure with heightened light sensitivity.</p>
+                        </div>
+                        <div class="bg-brand-dark p-5 rounded-2xl border border-brand-border space-y-2">
+                            <span class="text-xs font-extrabold text-brand-accent uppercase tracking-widest block"><i class="fa-solid fa-hourglass-half"></i> Duration & Progression</span>
+                            <p class="text-sm text-slate-200" id="summary-duration-display">Approximately 3 consecutive days.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-dark p-5 rounded-2xl border border-brand-border space-y-3">
+                        <span class="text-xs font-extrabold text-brand-accent uppercase tracking-widest block"><i class="fa-solid fa-file-medical"></i> Educational Diagnostic Assessment</span>
+                        <div class="text-sm text-slate-300 leading-relaxed space-y-2" id="summary-assessment-text">
+                            <!-- JS injected assessments -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cautionary Disclaimer Block -->
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-start gap-3">
+                    <i class="fa-solid fa-shield text-brand-yellow text-sm mt-0.5"></i>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        <strong>Educational Prototype Guideline:</strong> Information structured on this screen represents general instructional indicators. This output is completely simulated and should never serve as a clinical recommendation sheet.
+                    </p>
+                </div>
+
+                <!-- Summary CTA Action buttons -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-brand-border">
+                    <button onclick="navigateTo('consult')" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border px-6 py-3 rounded-xl text-sm font-bold text-slate-300 transition-all text-center">
+                        <i class="fa-solid fa-rotate-left"></i> Run New Consultation
+                    </button>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="navigateTo('doctors')" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border text-slate-200 hover:border-brand-accent px-6 py-3 rounded-xl text-sm font-bold transition-all text-center">
+                            Explore Doctor Profiles
+                        </button>
+                        <button onclick="autoDirectToDoctorBooking()" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-6 py-3 rounded-xl text-sm shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all text-center">
+                            Proceed to Book Consultation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: DOCTOR DIRECTORY -->
+        <section id="section-doctors" class="hidden py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div class="space-y-2">
+                    <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Available Clinical Partners</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Discover Demo Care Practitioners</h1>
+                    <p class="text-slate-400 text-sm max-w-xl">Filter and review our prototype roster of experienced healthcare specialists ready for simulation consultations.</p>
+                </div>
+                <!-- Mini Stats indicator -->
+                <span class="bg-brand-accent/10 border border-brand-accent/30 text-brand-accent px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider self-start md:self-auto">
+                    <i class="fa-solid fa-flask mr-1"></i> Demo Environment - 5 Profiles Loaded
+                </span>
+            </div>
+
+            <!-- Directory Filter Bar UI -->
+            <div class="bg-brand-card border-2 border-brand-border rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search bar -->
+                <div class="relative w-full md:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input type="text" id="search-doctor-input" onkeyup="filterDoctors()" placeholder="Search doctors by name or bio..." class="w-full bg-brand-dark border-2 border-brand-border rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-accent">
+                </div>
+                <!-- Filter categories buttons -->
+                <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
+                    <button onclick="filterDoctorSpecialty('all')" class="specialty-filter-btn px-4 py-2 bg-brand-accent text-brand-dark text-xs font-bold rounded-lg border border-brand-accent transition-all">All Fields</button>
+                    <button onclick="filterDoctorSpecialty('General Physician')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">General Physician</button>
+                    <button onclick="filterDoctorSpecialty('Cardiologist')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Cardiology</button>
+                    <button onclick="filterDoctorSpecialty('Dermatologist')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Dermatology</button>
+                    <button onclick="filterDoctorSpecialty('Pediatrician')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Pediatrics</button>
+                    <button onclick="filterDoctorSpecialty('Dentist')" class="specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all">Dental Care</button>
+                </div>
+            </div>
+
+            <!-- Doctor Card List Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="doctors-cards-grid">
+                <!-- Doctor cards dynamically output here -->
+            </div>
+        </section>
+
+        <!-- SECTION: BOOK APPOINTMENT -->
+        <section id="section-book" class="hidden py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="text-center space-y-2">
+                <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Secure Schedule Portal</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Schedule Your Demo Consultation</h1>
+                <p class="text-slate-400 text-sm max-w-lg mx-auto">Complete booking fields with arbitrary details to preview system appointment confirmations.</p>
+            </div>
+
+            <!-- Booking layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Doctor profile mini card -->
+                <div class="lg:col-span-5 bg-brand-card border-2 border-brand-border rounded-3xl p-6 space-y-4">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-brand-accent block">Booking Selected Provider</span>
+                    <div class="flex items-center gap-4 border-b border-brand-border pb-4" id="booking-doctor-header">
+                        <!-- JS generated summary -->
+                    </div>
+                    <!-- Calendar specs -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-bold text-slate-400 block"><i class="fa-solid fa-hospital-user text-brand-accent"></i> Demo Practice Hours</span>
+                        <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-border text-xs text-slate-300 space-y-1.5">
+                            <div class="flex justify-between">
+                                <span>Mon - Friday:</span>
+                                <span class="font-bold text-white">09:00 AM - 05:00 PM</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Saturday:</span>
+                                <span class="font-bold text-white">10:00 AM - 02:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input form parameters -->
+                <div class="lg:col-span-7 bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-6">
+                    <h3 class="text-lg font-bold text-white border-b border-brand-border pb-3">Consultation Scheduling Parameters</h3>
+                    
+                    <form onsubmit="handleBookingFormSubmit(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Patient Full Name</label>
+                                <input type="text" id="booking-patient-name" value="Aarav Sharma" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Preferred Date</label>
+                                <input type="date" id="booking-date" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Preferred Time Slot</label>
+                                <select id="booking-time" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
+                                    <option value="09:30 AM">09:30 AM</option>
+                                    <option value="11:00 AM">11:00 AM</option>
+                                    <option value="02:00 PM">02:00 PM</option>
+                                    <option value="03:30 PM">03:30 PM</option>
+                                    <option value="04:15 PM">04:15 PM</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Consultation Delivery Channel</label>
+                                <select id="booking-channel" required class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none">
+                                    <option value="Digital AI Sandbox Call">Digital AI Assisted Video Call</option>
+                                    <option value="In-person Consultation (Demo Practice)">In-Person Clinical Visit</option>
+                                    <option value="Voice Call Only">Voice Consultation</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Primary Consultation Note</label>
+                            <textarea id="booking-notes" rows="3" class="w-full bg-brand-dark border border-brand-border focus:border-brand-accent rounded-xl p-4 text-xs text-slate-100 focus:outline-none" placeholder="Enter brief overview (e.g., following up on AI triage results)..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold py-3.5 rounded-xl text-sm tracking-wide shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> Finalize Appointment Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: BOOKING CONFIRMATION -->
+        <section id="section-confirmation" class="hidden py-16 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-brand-card border-2 border-brand-border rounded-3xl p-8 space-y-6 text-center relative overflow-hidden">
+                <!-- Background visual glow -->
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-brand-accent/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-blue/10 rounded-full blur-3xl"></div>
+
+                <div class="w-16 h-16 bg-brand-accent/20 border-2 border-brand-accent text-brand-accent rounded-full flex items-center justify-center text-3xl mx-auto relative z-10">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+                
+                <div class="space-y-2 relative z-10">
+                    <h1 class="text-3xl font-black text-white">Booking Confirmed!</h1>
+                    <p class="text-sm text-slate-400">Your mock healthcare reservation has been registered inside our educational prototype database.</p>
+                </div>
+
+                <!-- Structured booking ID receipt details -->
+                <div id="booking-receipt-box" class="bg-brand-dark p-6 rounded-2xl border-2 border-brand-border text-left space-y-4 relative z-10">
+                    <!-- Injected details -->
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs text-slate-400 relative z-10 leading-relaxed text-center">
+                    <strong>Demo Protocol Notification:</strong> No actual clinicians will wait during physical clinical spaces for simulated calendars listed above.
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 pt-2 relative z-10 justify-center">
+                    <button onclick="navigateTo('dashboard')" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold px-6 py-3 rounded-xl text-xs shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2.5px] hover:translate-y-[2.5px] transition-all">
+                        Open Appointments Dashboard
+                    </button>
+                    <button onclick="navigateTo('home')" class="bg-brand-dark hover:bg-slate-850 border-2 border-brand-border hover:border-brand-accent px-6 py-3 rounded-xl text-xs font-bold text-slate-200 transition-all">
+                        Return Home
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: PATIENT APPOINTMENTS DASHBOARD -->
+        <section id="section-dashboard" class="hidden py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div class="space-y-2">
+                    <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Patient Information Center</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Active Appointments & Triage Logs</h1>
+                    <p class="text-slate-400 text-sm">Monitor simulated calendars, review history of symptoms consultation, and update mock baseline details.</p>
+                </div>
+                <!-- Profile snapshot button -->
+                <button onclick="openPatientProfileModal()" class="bg-brand-card hover:bg-slate-800 border-2 border-brand-border p-3 rounded-xl flex items-center gap-3 self-start md:self-auto text-left">
+                    <div class="w-9 h-9 rounded-full bg-brand-accent/20 border border-brand-accent flex items-center justify-center text-brand-accent">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-extrabold text-white block">Aarav Sharma</span>
+                        <span class="text-[10px] text-slate-400 block">Class 12 Demo Patient</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Quick metrics tracking boards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-brand-card border-2 border-brand-border p-6 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Scheduled Calendars</span>
+                        <span class="text-2xl font-black text-white" id="dashboard-total-appointments">0 Appointments</span>
+                    </div>
+                </div>
+                <div class="bg-brand-card border-2 border-brand-border p-6 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-brand-blue/10 border border-brand-blue/30 text-brand-blue flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">AI Triage History</span>
+                        <span class="text-2xl font-black text-white" id="dashboard-total-consultations">0 Completed Runs</span>
+                    </div>
+                </div>
+                <div class="bg-brand-card border-2 border-brand-border p-6 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Allergy Vector Alert</span>
+                        <span class="text-xs font-bold text-slate-200">No Penicillin/Sulfa (Demo Profile)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Tables (Schedule list) -->
+            <div class="bg-brand-card border-2 border-brand-border rounded-2xl overflow-hidden">
+                <div class="p-5 border-b border-brand-border flex items-center justify-between flex-wrap gap-4">
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-list text-brand-accent"></i> Active Demo Bookings</h3>
+                    <button onclick="navigateTo('doctors')" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold px-4 py-2 rounded-lg text-xs transition-colors">Book Another Consultation</button>
+                </div>
+                <!-- Dynamic appointments table container -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs md:text-sm">
+                        <thead class="bg-brand-dark text-slate-400 font-extrabold uppercase tracking-wider border-b border-brand-border">
+                            <tr>
+                                <th class="p-4">Doctor Profile</th>
+                                <th class="p-4">Delivery Channel</th>
+                                <th class="p-4">Scheduled Date & Time</th>
+                                <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-right">Reference Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-appointments-tbody" class="divide-y divide-brand-border text-slate-200">
+                            <!-- Injected rows of bookings -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Empty state visual helper inside dashboard -->
+                <div id="dashboard-empty-state" class="hidden p-12 text-center space-y-3">
+                    <i class="fa-regular fa-calendar-times text-4xl text-slate-650"></i>
+                    <p class="text-slate-400 text-sm">No scheduled mock doctor consultations detected within local temporary storage arrays.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: HEALTH RESOURCES (EDUCATIONAL TIPS) -->
+        <section id="section-resources" class="hidden py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="text-center max-w-3xl mx-auto space-y-2">
+                <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Preventive Healthcare Track</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight font-sans">Educational Medical Resources</h1>
+                <p class="text-slate-400 text-sm">Explore core diagnostic concepts, preventative lifestyle guidelines, and safety triage methodologies.</p>
+            </div>
+
+            <!-- Health grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <span class="bg-brand-blue/10 border border-brand-blue/30 text-brand-blue text-[10px] px-2.5 py-1 rounded font-bold uppercase tracking-wider inline-block">Cardiology</span>
+                        <h3 class="text-lg font-bold text-white">Critical Indicators of Cardiac Dysfunctions</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">Understand major chest discomfort triggers, recognizing critical cardiovascular stress markers, and standard safety emergency maneuvers.</p>
+                    </div>
+                    <div class="p-6 border-t border-brand-border bg-brand-dark/40 flex items-center justify-between text-xs">
+                        <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 5 min read</span>
+                        <a href="https://www.who.int/health-topics/cardiovascular-diseases" target="_blank" class="text-brand-accent font-bold hover:underline">Read WHO Guide <i class="fa-solid fa-arrow-right-long ml-1"></i></a>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <span class="bg-brand-accent/10 border border-brand-accent/30 text-brand-accent text-[10px] px-2.5 py-1 rounded font-bold uppercase tracking-wider inline-block">Triage & Diagnostics</span>
+                        <h3 class="text-lg font-bold text-white">How Clinical Systems Rank Symptom Urgency</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">Review the science of clinical classification, understanding the standard red/yellow/green medical urgency tiers used by paramedics worldwide.</p>
+                    </div>
+                    <div class="p-6 border-t border-brand-border bg-brand-dark/40 flex items-center justify-between text-xs">
+                        <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 7 min read</span>
+                        <a href="https://en.wikipedia.org/wiki/Triage" target="_blank" class="text-brand-accent font-bold hover:underline">Learn Triage <i class="fa-solid fa-arrow-right-long ml-1"></i></a>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <span class="bg-brand-yellow/10 border border-brand-yellow/30 text-brand-yellow text-[10px] px-2.5 py-1 rounded font-bold uppercase tracking-wider inline-block">Wellness & Hygiene</span>
+                        <h3 class="text-lg font-bold text-white">Combating Seasonal Influenza: Core Preventative Rules</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">Basic sanitary routines, optimal hydration benchmarks, dietary defense tips, and determining when influenza requires prescription consults.</p>
+                    </div>
+                    <div class="p-6 border-t border-brand-border bg-brand-dark/40 flex items-center justify-between text-xs">
+                        <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
+                        <a href="https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)" target="_blank" class="text-brand-accent font-bold hover:underline">WHO Fact Sheet <i class="fa-solid fa-arrow-right-long ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- High level stats informational infographic -->
+            <div class="bg-brand-card border-2 border-brand-border rounded-3xl p-8 flex flex-col lg:flex-row items-center justify-between gap-8">
+                <div class="space-y-4 max-w-xl">
+                    <h3 class="text-2xl font-extrabold text-white tracking-tight">Understanding Standard Urgency Indicators</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Whenever medical professionals parse triage, patients are cataloged by resource urgency level. MediAI simulates this framework using a three-stage scale:
+                    </p>
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-start gap-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-accent mt-1.5 flex-shrink-0"></span>
+                            <p class="text-xs text-slate-300"><strong>GREEN (General Information):</strong> Mild issues. Self-monitoring is typically sufficient unless symptoms worsen.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-yellow mt-1.5 flex-shrink-0"></span>
+                            <p class="text-xs text-slate-300"><strong>YELLOW (Consult Practitioner):</strong> Moderate issues. Schedule a professional clinical consultation to prevent progression.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-red mt-1.5 flex-shrink-0"></span>
+                            <p class="text-xs text-slate-300"><strong>RED (Emergency Care):</strong> Highly severe. Urgent intervention required. Call local emergency networks immediately.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-96 bg-brand-dark p-6 rounded-2xl border border-brand-border space-y-4 text-center">
+                    <div class="text-5xl font-black text-brand-accent text-glow">102</div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-white block">Democratic Emergency Call Line</span>
+                        <span class="text-[10px] text-slate-450 block leading-relaxed">If physical emergencies manifest, dial 102 immediately (Nepal Ministry of Health demo mapping).</span>
+                    </div>
+                    <div class="border-t border-brand-border pt-4">
+                        <a href="tel:102" class="inline-block bg-red-650 hover:bg-red-750 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">Call Demo Emergency Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: ABOUT MEDIAI (PROJECT INFO) -->
+        <section id="section-about" class="hidden py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div class="text-center space-y-2">
+                <span class="text-brand-accent text-xs font-bold uppercase tracking-widest block">Class 12 AI + Web Exhibition Project</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">The Story Behind MediAI Prototype</h1>
+                <p class="text-slate-400 text-sm max-w-xl mx-auto">An advanced web demonstration framework visualizing the potential integrations of artificial intelligence in healthcare delivery structures.</p>
+            </div>
+
+            <!-- Details Block -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                <div class="md:col-span-7 bg-brand-card border-2 border-brand-border rounded-3xl p-6 md:p-8 space-y-5">
+                    <h3 class="text-xl font-bold text-white border-b border-brand-border pb-3"><i class="fa-solid fa-graduation-cap text-brand-accent"></i> Academic Project Framework</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        This web portal has been designed for a Class 12 AI and web design competition. It is designed to illustrate how computer networks and artificial intelligence algorithms can cooperate to lower barriers to preventative triage diagnostics.
+                    </p>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Rather than displaying standard landing fields, our model explores fully end-to-end sandbox workflows: starting from simple user expressions, routing through interactive AI prompt triage models, parsing classification urgency reports, and connecting directly with dummy specialist networks.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="bg-brand-dark p-4 rounded-xl border border-brand-border">
+                            <span class="text-brand-accent font-bold text-xl block">100%</span>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-extrabold">Responsive Design</span>
+                        </div>
+                        <div class="bg-brand-dark p-4 rounded-xl border border-brand-border">
+                            <span class="text-brand-accent font-bold text-xl block">Tailwind CSS</span>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-extrabold">Styling Core</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-5 bg-brand-card border-2 border-brand-border rounded-3xl p-6 space-y-4">
+                    <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-code text-brand-blue"></i> Technical Specifications</h3>
+                    <div class="space-y-3.5 text-xs">
+                        <div class="flex justify-between items-center border-b border-brand-border pb-2">
+                            <span class="text-slate-400">Environment Target:</span>
+                            <span class="font-bold text-slate-200">Class 12 Exhibition</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-brand-border pb-2">
+                            <span class="text-slate-400">Front-End Frame:</span>
+                            <span class="font-bold text-brand-accent">Tailwind CSS v3.x</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-brand-border pb-2">
+                            <span class="text-slate-400">Interactive Engine:</span>
+                            <span class="font-bold text-brand-blue">Vanilla JavaScript State Engine</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-2">
+                            <span class="text-slate-400">Deploy Sandbox:</span>
+                            <span class="font-bold text-slate-200">Localhost / Web Iframe API</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-center">
+                        <span class="text-[10px] font-black tracking-wider uppercase text-brand-yellow block mb-1">Project Integrity Certificate</span>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Engineered strictly with open source design principles. All dummy clinical descriptions represent mock entries.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER DESIGN -->
+    <footer class="bg-brand-dark border-t-2 border-brand-border py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                <div class="md:col-span-5 space-y-4">
+                    <!-- Footer Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-brand-accent flex items-center justify-center text-brand-dark font-extrabold text-base">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                        <span class="text-xl font-extrabold tracking-tight text-white">Medi<span class="text-brand-accent">AI</span></span>
+                    </div>
+                    <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+                        An advanced clinical triage chatbot simulation prototype, designed and configured for High School Web Design & Artificial Intelligence Competitions.
+                    </p>
+                </div>
+                <!-- Links list -->
+                <div class="md:col-span-3 space-y-3 text-xs">
+                    <span class="font-extrabold text-white uppercase tracking-widest block">Simulation Panels</span>
+                    <div class="space-y-2 text-slate-400 font-semibold">
+                        <button onclick="navigateTo('home')" class="block hover:text-white transition-colors">Platform Landing Page</button>
+                        <button onclick="navigateTo('consult')" class="block hover:text-white transition-colors">AI Consultation Assistant</button>
+                        <button onclick="navigateTo('doctors')" class="block hover:text-white transition-colors">Care Practitioner Finder</button>
+                        <button onclick="navigateTo('dashboard')" class="block hover:text-white transition-colors">Active Triage Log Dashboard</button>
+                    </div>
+                </div>
+                <!-- Disclaimer box -->
+                <div class="md:col-span-4 space-y-3">
+                    <span class="text-xs font-extrabold text-white uppercase tracking-widest block">Strict Sandbox Warning</span>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        This service does not provide certified medical evaluations. All clinical diagnostic advice presented inside conversations is compiled from demonstration response scripts. If experiencing emergencies, seek credentialed expert consults.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bottom border segment -->
+            <div class="border-t border-brand-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+                <p>&copy; 2025 MediAI Project Prototype. Prepared for Class 12 Web Design & AI Competitions.</p>
+                <div class="flex items-center gap-4 font-bold">
+                    <a href="#" onclick="navigateTo('about')" class="hover:text-slate-350">Developer Details</a>
+                    <span>•</span>
+                    <a href="#" onclick="alert('Demo prototype does not maintain private telemetry trackers.')" class="hover:text-slate-350">Privacy Guidelines</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE PATIENT PROFILE MODAL -->
+    <div id="patient-profile-modal" class="fixed inset-0 z-50 hidden bg-brand-dark/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-brand-card border-2 border-brand-border rounded-3xl max-w-md w-full p-6 relative space-y-6">
+            <button onclick="closePatientProfileModal()" class="absolute top-4 right-4 w-9 h-9 rounded-lg border border-brand-border flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-full bg-brand-accent/20 border-2 border-brand-accent flex items-center justify-center text-brand-accent text-3xl mx-auto">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <h3 class="text-lg font-black text-white">Active Patient Credentials</h3>
+                <span class="text-[10px] bg-brand-accent/20 text-brand-accent border border-brand-accent/30 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">Default Demo Session Profile</span>
+            </div>
+
+            <!-- Profile Info block -->
+            <div class="space-y-3 text-xs">
+                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
+                    <span class="text-slate-400">Patient Full Name:</span>
+                    <span class="font-bold text-white">Aarav Sharma</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
+                    <span class="text-slate-400">Demographic Age / Sex:</span>
+                    <span class="font-bold text-white">24 Years Old / Male</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
+                    <span class="text-slate-400">Primary Location:</span>
+                    <span class="font-bold text-white">Kathmandu, Nepal</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-brand-border pb-2.5">
+                    <span class="text-slate-400">Medical Allergy Tiers:</span>
+                    <span class="font-bold text-brand-red">Hypersensitive to Penicillin Compounds</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400">Current Blood Group:</span>
+                    <span class="font-bold text-white">O Positive (O+)</span>
+                </div>
+            </div>
+
+            <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-border text-center text-xs text-slate-400">
+                You can alter booking names directly inside the scheduling screen inputs during reservation sequences.
+            </div>
+
+            <button onclick="closePatientProfileModal()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold py-3 rounded-xl text-xs transition-colors">
+                Return to Sandbox Console
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT STATE CONTROLLER -->
+    <script>
+        // GLOBAL DATA MODELS & STATE CONTROLS
+        let activeScreen = 'home';
+        let language = 'en';
+
+        // Simulated Database for Booked Appointments
+        let appointments = [];
+        // Track completed consultations
+        let completedConsultCount = 0;
+
+        // Active Chat Log Variables
+        let chatMessages = [];
+        let chatStep = 0; 
+        let activeSymptomScenario = null; 
+        let compiledSymptomData = {
+            symptoms: "Awaiting consultation run",
+            duration: "N/A",
+            severity: 5,
+            level: "GREEN",
+            assessment: "No analysis generated yet."
+        };
+
+        // Doctor Static Demo Dataset
+        const doctorsData = [
+            {
+                id: 'doc-1',
+                name: "Dr. Sanduk Ruit (Demo Profile)",
+                specialty: "General Physician",
+                experience: "15 Years",
+                rating: "4.9",
+                availability: "Mon, Wed, Fri",
+                fee: "NPR 1,000",
+                img: "fa-user-doctor",
+                bio: "Experienced internal medicine and clinical physician specializing in chronic symptom evaluation and primary triage care."
+            },
+            {
+                id: 'doc-2',
+                name: "Dr. Bhagwan Koirala (Demo Profile)",
+                specialty: "Cardiologist",
+                experience: "22 Years",
+                rating: "5.0",
+                availability: "Tue, Thu",
+                fee: "NPR 2,500",
+                img: "fa-heart-pulse",
+                bio: "Expert cardiology consultant. Specializes in heart valve diagnostics, vascular monitoring, and cardiac risk assessment."
+            },
+            {
+                id: 'doc-3',
+                name: "Dr. Melina Rai (Demo Profile)",
+                specialty: "Dermatologist",
+                experience: "9 Years",
+                rating: "4.7",
+                availability: "Mon, Tue, Thu",
+                fee: "NPR 1,200",
+                img: "fa-stethoscope",
+                bio: "Dedicated dermatology care focusing on acute rashes, diagnostic skin allergy logs, and persistent pediatric skin triggers."
+            },
+            {
+                id: 'doc-4',
+                name: "Dr. Aarav Joshi (Demo Profile)",
+                specialty: "Pediatrician",
+                experience: "11 Years",
+                rating: "4.8",
+                availability: "Wed, Fri, Sat",
+                fee: "NPR 1,100",
+                img: "fa-baby",
+                bio: "Friendly and highly trusted pediatrician specializing in childhood vaccination plans, immune building, and developmental checkups."
+            },
+            {
+                id: 'doc-5',
+                name: "Dr. Samata Shrestha (Demo Profile)",
+                specialty: "Dentist",
+                experience: "7 Years",
+                rating: "4.6",
+                availability: "Mon, Wed, Sat",
+                fee: "NPR 800",
+                img: "fa-tooth",
+                bio: "Expert in restorative dental care, root canal procedures, pediatric oral hygiene, and cosmetic dental operations."
+            }
+        ];
+
+        let selectedDoctor = doctorsData[0];
+
+        // NEPOLI TRANSLATIONS DICTIONARY
+        const dictionary = {
+            en: {
+                subtitle: "Understand your health concerns, get general health information, and discover the right next step with AI.",
+                primaryBtn: "Start AI Consultation",
+                secondaryBtn: "Find a Doctor",
+                emergency: "<strong>Immediate Medical Warning:</strong> If you are experiencing a severe emergency, please contact your local emergency services immediately.",
+            },
+            ne: {
+                subtitle: "आफ्नो स्वास्थ्य समस्याहरू बुझ्नुहोस्, सामान्य स्वास्थ्य जानकारी प्राप्त गर्नुहोस्, र एआईको सहयोगमा सही अर्को कदम पत्ता लगाउनुहोस्।",
+                primaryBtn: "एआई परामर्श सुरु गर्नुहोस्",
+                secondaryBtn: "चिकित्सक पत्ता लगाउनुहोस्",
+                emergency: "<strong>तत्काल चिकित्सा चेतावनी:</strong> यदि तपाईं गम्भीर आपतकालीन अवस्था सामना गर्दै हुनुहुन्छ भने, कृपया तुरुन्तै स्थानीय आपतकालीन सेवाहरूमा सम्पर्क गर्नुहोस्।",
+            }
+        };
+
+        // DOM RENDER ON STARTUP
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDoctorsList();
+            renderAppointmentsDashboard();
+            updateDashboardCounters();
+            
+            // Set dynamic date picker to default to tomorrow's date
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('booking-date').value = tomorrow.toISOString().split('T')[0];
+        });
+
+        // SPA NAVIGATION SYSTEM
+        function navigateTo(screenId) {
+            // Hide all screen sections
+            const screens = ['home', 'consult', 'summary', 'doctors', 'book', 'confirmation', 'dashboard', 'resources', 'about'];
+            screens.forEach(s => {
+                const element = document.getElementById(`section-${s}`);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+
+            // Show selected screen section
+            const activeElement = document.getElementById(`section-${screenId}`);
+            if (activeElement) {
+                activeElement.classList.remove('hidden');
+            }
+            activeScreen = screenId;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // MOBILE NAVIGATION BAR HAMBURGER CONTROL
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.className = "fa-solid fa-xmark text-xl";
+            } else {
+                menu.classList.add('hidden');
+                icon.className = "fa-solid fa-bars text-xl";
+            }
+        }
+
+        // LANGUAGE DICTIONARY SELECTOR SWITCH
+        function toggleLanguage() {
+            language = (language === 'en') ? 'ne' : 'en';
+            const langBtn = document.getElementById('lang-switch-btn');
+            
+            if (language === 'ne') {
+                langBtn.innerHTML = `<i class="fa-solid fa-language text-base text-brand-accent"></i> <span>English / EN</span>`;
+                // Apply localization translations
+                document.getElementById('hero-subtitle').innerText = dictionary.ne.subtitle;
+                document.getElementById('hero-btn-primary').innerText = dictionary.ne.primaryBtn;
+                document.getElementById('hero-btn-secondary').innerText = dictionary.ne.secondaryBtn;
+                document.getElementById('nav-emergency-banner').innerHTML = dictionary.ne.emergency;
+            } else {
+                langBtn.innerHTML = `<i class="fa-solid fa-language text-base text-brand-accent"></i> <span>नेपाली / EN</span>`;
+                // Apply localization translations
+                document.getElementById('hero-subtitle').innerText = dictionary.en.subtitle;
+                document.getElementById('hero-btn-primary').innerText = dictionary.en.primaryBtn;
+                document.getElementById('hero-btn-secondary').innerText = dictionary.en.secondaryBtn;
+                document.getElementById('nav-emergency-banner').innerHTML = dictionary.en.emergency;
+            }
+        }
+
+        // MODAL CONTROLLERS
+        function openPatientProfileModal() {
+            document.getElementById('patient-profile-modal').classList.remove('hidden');
+        }
+        function closePatientProfileModal() {
+            document.getElementById('patient-profile-modal').classList.add('hidden');
+        }
+
+        // DOCK CHAT SIMULATION LOGICS & SYMPTOM PATHWAYS
+        const symptomFlows = {
+            chest_pain: {
+                urgency: 'RED',
+                symptoms: "Sudden sharp left-sided crushing chest pain radiating to left arm",
+                duration: "Active for 30 minutes, escalating rapidly",
+                severity: 9.5,
+                dialogues: [
+                    {
+                        ai: "Warning: Chest pressure of sudden onset is classified as high acute risk. Does the pain radiate to your left shoulder, jaw, or neck, and are you breathing heavily?"
+                    },
+                    {
+                        user: "Yes, it is radiating into my left arm, and I am feeling highly nauseous and sweating."
+                    },
+                    {
+                        ai: "CRITICAL SYSTEM NOTICE: These parameters closely correlate with Acute Cardiac Stress indicators. This simulation recommends immediate emergency action. We have locked high-urgency diagnostic codes."
+                    }
+                ],
+                assessment: "The simulated parameters strongly reflect a potential Acute Coronary Episode or significant cardiovascular distress pattern. This is a critical class RED indicator."
+            },
+            migraine: {
+                urgency: 'YELLOW',
+                symptoms: "Severe throbbing unilateral headache with photosensitivity",
+                duration: "Present for 2 days",
+                severity: 6.8,
+                dialogues: [
+                    {
+                        ai: "Are you currently noticing sensory aura, blurred vision boundaries, or nausea triggered by bright lights or loud environments?"
+                    },
+                    {
+                        user: "Yes, standard lights hurt my eyes intensely, and I hear a slight ringing sound."
+                    },
+                    {
+                        ai: "Assessment logged. Your symptoms align with severe neurological migraine conditions. While not immediately life-threatening, a professional doctor visit is recommended to obtain appropriate prescription medication pathways."
+                    }
+                ],
+                assessment: "Symptoms are highly suggestive of severe migraine with photosensitivity and minor auditory strain. Recommend consult with a General Physician or Neurologist to discuss abortive therapies."
+            },
+            mild_cold: {
+                urgency: 'GREEN',
+                symptoms: "Mild scratchy throat, nasal congestion, occasional dry sneezing",
+                duration: "1 day",
+                severity: 3.2,
+                dialogues: [
+                    {
+                        ai: "Are you experiencing high body temperature, difficulty breathing, or severe pain when swallowing?"
+                    },
+                    {
+                        user: "No, breathing is standard. No fever. Just a slightly dry and congested nasal airway."
+                    },
+                    {
+                        ai: "Noted. Nasal congestion and throat itching without systemic fever typical point to localized rhinitis or mild seasonal flu vectors. Monitor temperature closely."
+                    }
+                ],
+                assessment: "Indicates mild Upper Respiratory congestion. Self-care protocols including warm hydration, saline throat rinses, and systemic rest should be followed. Monitor for developments."
+            }
+        };
+
+        // SCENARIOS ACTIVATION TRIGGERS
+        function triggerSymptomScenario(scenarioKey) {
+            activeSymptomScenario = symptomFlows[scenarioKey];
+            chatStep = 0;
+            
+            // Clear message list and insert baseline intro
+            const container = document.getElementById('chat-messages-container');
+            container.innerHTML = `
+                <div class="flex items-start gap-3 max-w-[85%] self-start">
+                    <div class="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center flex-shrink-0 text-sm">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-brand-dark border border-brand-border px-4 py-3 rounded-2xl rounded-tl-none text-sm text-slate-200">
+                        <p class="font-bold text-brand-accent mb-1"><i class="fa-solid fa-circle-play"></i> Preset Loaded: ${scenarioKey.toUpperCase().replace('_', ' ')}</p>
+                        <p>Loading interactive simulation path. Follow the prompts below to preview standard clinical outputs.</p>
+                    </div>
+                </div>
+            `;
+
+            // Display User symptom statement
+            setTimeout(() => {
+                appendChatMessage('user', activeSymptomScenario.symptoms);
+                updateUrgencyDisplay(activeSymptomScenario.urgency);
+                
+                // Show AI typing follow-up
+                triggerAITypingResponse(() => {
+                    appendChatMessage('ai', activeSymptomScenario.dialogues[0].ai);
+                    chatStep = 1;
+                });
+            }, 800);
+        }
+
+        // CHAT MESSAGE DOM HANDLERS
+        function appendChatMessage(sender, text) {
+            const container = document.getElementById('chat-messages-container');
+            const messageRow = document.createElement('div');
+            
+            if (sender === 'user') {
+                messageRow.className = "flex items-start gap-3 max-w-[85%] self-end flex-row-reverse";
+                messageRow.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-brand-blue/10 border border-brand-blue/30 text-brand-blue flex items-center justify-center flex-shrink-0 text-sm">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div class="bg-brand-blue/10 border border-brand-blue/30 px-4 py-3 rounded-2xl rounded-tr-none text-sm text-slate-200">
+                        <p>${text}</p>
+                    </div>
+                `;
+            } else {
+                messageRow.className = "flex items-start gap-3 max-w-[85%] self-start";
+                messageRow.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center flex-shrink-0 text-sm">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-brand-dark border border-brand-border px-4 py-3 rounded-2xl rounded-tl-none text-sm text-slate-200">
+                        <p>${text}</p>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageRow);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // AI TYPING INDICATOR TIMERS
+        function triggerAITypingResponse(callback) {
+            const indicator = document.getElementById('typing-indicator');
+            indicator.classList.remove('hidden');
+            setTimeout(() => {
+                indicator.classList.add('hidden');
+                callback();
+            }, 1200);
+        }
+
+        // CHAT FORM INTERACTIVE CONTROLLER (Manual messages)
+        function handleChatSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-input');
+            const userMsg = input.value.trim();
+            if (!userMsg) return;
+
+            appendChatMessage('user', userMsg);
+            input.value = '';
+
+            // Handle script logic sequences
+            if (activeSymptomScenario) {
+                if (chatStep === 1) {
+                    triggerAITypingResponse(() => {
+                        appendChatMessage('ai', activeSymptomScenario.dialogues[1].ai);
+                        chatStep = 2;
+                    });
+                } else if (chatStep === 2) {
+                    triggerAITypingResponse(() => {
+                        appendChatMessage('ai', "Thank you for detailing those developments. Our assessment metrics are completely finalized. Click the 'Compile Diagnostic Summary' button below to review your triage card.");
+                    });
+                } else {
+                    triggerStandardGenericAIResponse();
+                }
+            } else {
+                // If user didn't select scenario, automatically map to standard Yellow response to keep prototype fully cohesive
+                triggerAITypingResponse(() => {
+                    appendChatMessage('ai', "Your stated concern has been logged. Let's run our moderate classification preset: Severe Throbbing Headache with photophobia. Is the pain localized to one side of the head, and do bright screens worsen your condition?");
+                    // Lock-in migraine flow for ease of live simulation
+                    activeSymptomScenario = symptomFlows.migraine;
+                    chatStep = 1;
+                    updateUrgencyDisplay('YELLOW');
+                });
+            }
+        }
+
+        // Standard Fallback AI
+        function triggerStandardGenericAIResponse() {
+            triggerAITypingResponse(() => {
+                appendChatMessage('ai', "I have documented your follow-up data. Please click 'Compile Diagnostic Summary' below to map these outcomes to suggested specialist doctor care.");
+            });
+        }
+
+        // UPDATE CHAT URGENCY LEVEL PILLS
+        function updateUrgencyDisplay(level) {
+            const pill = document.getElementById('urgency-pill-display');
+            if (level === 'RED') {
+                pill.className = "bg-red-500/20 border border-red-500 text-red-400 px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider animate-pulse";
+                pill.innerText = "RED – Urgent Care Required";
+            } else if (level === 'YELLOW') {
+                pill.className = "bg-brand-yellow/20 border border-brand-yellow text-brand-yellow px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider";
+                pill.innerText = "YELLOW – Consult Doctor";
+            } else {
+                pill.className = "bg-brand-accent/20 border border-brand-accent text-brand-accent px-3 py-0.5 rounded text-xs font-black uppercase tracking-wider";
+                pill.innerText = "GREEN – General Information";
+            }
+        }
+
+        // COMPILE CHAT TO REPORT SCREEN
+        function compileSymptomSummary() {
+            // Build fallback compiled statistics if user clicked bypass
+            if (!activeSymptomScenario) {
+                activeSymptomScenario = symptomFlows.migraine; 
+            }
+
+            compiledSymptomData = {
+                symptoms: activeSymptomScenario.symptoms,
+                duration: activeSymptomScenario.duration,
+                severity: activeSymptomScenario.severity,
+                level: activeSymptomScenario.urgency,
+                assessment: activeSymptomScenario.assessment
+            };
+
+            completedConsultCount++;
+            updateDashboardCounters();
+
+            // Populate Report elements
+            const banner = document.getElementById('summary-urgency-banner');
+            const badgeIconContainer = document.getElementById('summary-urgency-icon-container');
+            const urgencyTitle = document.getElementById('summary-urgency-title');
+            const urgencySubtitle = document.getElementById('summary-urgency-subtitle');
+            const severityScore = document.getElementById('summary-severity-score');
+            
+            // Symptoms lists
+            document.getElementById('summary-symptoms-list').innerText = compiledSymptomData.symptoms;
+            document.getElementById('summary-duration-display').innerText = compiledSymptomData.duration;
+            document.getElementById('summary-assessment-text').innerHTML = `
+                <p class="mb-2">${compiledSymptomData.assessment}</p>
+                <p class="text-xs text-slate-400 font-medium">This triage logic leverages informational maps mapped out by our high school prototyping framework to direct you to relevant, appropriate care.</p>
+            `;
+
+            severityScore.innerText = `${compiledSymptomData.severity} / 10`;
+
+            // Color coordinate according to risk levels
+            if (compiledSymptomData.level === 'RED') {
+                banner.className = "p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-red-500 bg-red-950/40 text-red-200";
+                badgeIconContainer.className = "w-12 h-12 rounded-xl bg-red-500/20 border border-red-500 text-red-400 flex items-center justify-center text-xl";
+                badgeIconContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+                urgencyTitle.innerText = "RED – Seek Urgent Care";
+                urgencyTitle.className = "text-xl font-extrabold text-red-400";
+                urgencySubtitle.className = "text-[10px] font-black uppercase tracking-widest text-red-300 block";
+            } else if (compiledSymptomData.level === 'YELLOW') {
+                banner.className = "p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-brand-yellow bg-brand-yellow/10 text-brand-yellow";
+                badgeIconContainer.className = "w-12 h-12 rounded-xl bg-brand-yellow/20 border border-brand-yellow text-brand-yellow flex items-center justify-center text-xl";
+                badgeIconContainer.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
+                urgencyTitle.innerText = "YELLOW – Consider Medical Consult";
+                urgencyTitle.className = "text-xl font-extrabold text-brand-yellow";
+                urgencySubtitle.className = "text-[10px] font-black uppercase tracking-widest text-brand-yellow block";
+            } else {
+                banner.className = "p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-brand-accent bg-brand-accent/5 text-slate-200";
+                badgeIconContainer.className = "w-12 h-12 rounded-xl bg-brand-accent/20 border border-brand-accent text-brand-accent flex items-center justify-center text-xl";
+                badgeIconContainer.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+                urgencyTitle.innerText = "GREEN – General Care / Self-Care";
+                urgencyTitle.className = "text-xl font-extrabold text-brand-accent";
+                urgencySubtitle.className = "text-[10px] font-black uppercase tracking-widest text-brand-accent block";
+            }
+
+            navigateTo('summary');
+        }
+
+        // DOCTORS RENDERING & FILTERS
+        function renderDoctorsList(filterSpecialty = 'all', searchKeyword = '') {
+            const grid = document.getElementById('doctors-cards-grid');
+            grid.innerHTML = '';
+
+            const filteredDocs = doctorsData.filter(doc => {
+                const matchesSpecialty = (filterSpecialty === 'all' || doc.specialty === filterSpecialty);
+                const matchesSearch = doc.name.toLowerCase().includes(searchKeyword.toLowerCase()) || 
+                                      doc.bio.toLowerCase().includes(searchKeyword.toLowerCase());
+                return matchesSpecialty && matchesSearch;
+            });
+
+            filteredDocs.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = "glass-card p-6 rounded-2xl flex flex-col justify-between space-y-5";
+                card.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-brand-dark border border-brand-border px-3 py-1 rounded-lg text-[10px] font-black text-brand-accent uppercase tracking-widest">${doc.specialty}</span>
+                            <span class="text-xs text-brand-yellow font-bold"><i class="fa-solid fa-star"></i> ${doc.rating} Rating</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-brand-accent/10 border-2 border-brand-border flex items-center justify-center text-brand-accent text-xl">
+                                <i class="fa-solid ${doc.img}"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white leading-tight">${doc.name}</h3>
+                                <span class="text-xs text-slate-450">${doc.experience} Experience</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">${doc.bio}</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-brand-border space-y-3">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>Available slots:</span>
+                            <span class="font-bold text-slate-200">${doc.availability}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-slate-400 pb-2">
+                            <span>Consult Fee:</span>
+                            <span class="font-bold text-white text-sm">${doc.fee}</span>
+                        </div>
+                        <button onclick="initiateAppointmentBooking('${doc.id}')" class="w-full bg-brand-dark hover:bg-brand-accent hover:text-brand-dark border-2 border-brand-border hover:border-brand-accent text-slate-200 text-xs font-bold py-2.5 rounded-xl transition-all text-center flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calendar-plus"></i> Select & Book slot
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterDoctorSpecialty(specialty) {
+            // Update selected style on buttons
+            const buttons = document.querySelectorAll('.specialty-filter-btn');
+            buttons.forEach(btn => {
+                if (btn.innerText.toLowerCase().includes(specialty.toLowerCase().split(' ')[0]) || (specialty === 'all' && btn.innerText.includes('All'))) {
+                    btn.className = "specialty-filter-btn px-4 py-2 bg-brand-accent text-brand-dark text-xs font-bold rounded-lg border border-brand-accent transition-all";
+                } else {
+                    btn.className = "specialty-filter-btn px-4 py-2 bg-brand-dark text-slate-300 text-xs font-bold rounded-lg border border-brand-border hover:border-brand-accent transition-all";
+                }
+            });
+            renderDoctorsList(specialty, document.getElementById('search-doctor-input').value);
+        }
+
+        function filterDoctors() {
+            const keyword = document.getElementById('search-doctor-input').value;
+            renderDoctorsList('all', keyword);
+        }
+
+        // DIRECT FROM DIAGNOSTIC TO THE RELEVANT CLINICIAN
+        function autoDirectToDoctorBooking() {
+            // Match diagnostic results to relevant doctor
+            let matchedDocId = 'doc-1'; // Default General Doc
+            if (compiledSymptomData.symptoms.toLowerCase().includes('heart') || compiledSymptomData.symptoms.toLowerCase().includes('chest')) {
+                matchedDocId = 'doc-2'; // Cardiologist
+            } else if (compiledSymptomData.symptoms.toLowerCase().includes('throat') || compiledSymptomData.symptoms.toLowerCase().includes('cold')) {
+                matchedDocId = 'doc-1'; // GP
+            } else if (compiledSymptomData.symptoms.toLowerCase().includes('migraine') || compiledSymptomData.symptoms.toLowerCase().includes('headache')) {
+                matchedDocId = 'doc-1'; // GP
+            }
+            initiateAppointmentBooking(matchedDocId);
+        }
+
+        // INITIATE BOOKING FLOW
+        function initiateAppointmentBooking(doctorId) {
+            const docObj = doctorsData.find(d => d.id === doctorId);
+            if (!docObj) return;
+
+            selectedDoctor = docObj;
+
+            // Render Doctor Mini Profile header in Booking Panel
+            const header = document.getElementById('booking-doctor-header');
+            header.innerHTML = `
+                <div class="w-12 h-12 bg-brand-accent/20 rounded-xl flex items-center justify-center text-brand-accent text-xl">
+                    <i class="fa-solid ${selectedDoctor.img}"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-black text-white">${selectedDoctor.name}</h4>
+                    <span class="text-[10px] text-brand-accent font-extrabold uppercase tracking-widest block">${selectedDoctor.specialty}</span>
+                    <span class="text-[10px] text-slate-400 block">${selectedDoctor.experience} Exp • Mock Consultation Fee: ${selectedDoctor.fee}</span>
+                </div>
+            `;
+
+            navigateTo('book');
+        }
+
+        // HANDLE APPOINTMENT RESERVATIONS SUBMITS
+        function handleBookingFormSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('booking-patient-name').value;
+            const date = document.getElementById('booking-date').value;
+            const time = document.getElementById('booking-time').value;
+            const channel = document.getElementById('booking-channel').value;
+            const notes = document.getElementById('booking-notes').value || "No baseline follow-up notes inputted.";
+
+            const bookingID = "MED-AI-" + Math.floor(100000 + Math.random() * 900000);
+
+            const newBooking = {
+                id: bookingID,
+                doctor: selectedDoctor,
+                patientName: name,
+                date: date,
+                time: time,
+                channel: channel,
+                notes: notes,
+                status: 'Confirmed'
+            };
+
+            // Store in simulated dynamic array
+            appointments.unshift(newBooking);
+            updateDashboardCounters();
+            renderAppointmentsDashboard();
+
+            // Populate confirmation receipt details
+            const receipt = document.getElementById('booking-receipt-box');
+            receipt.innerHTML = `
+                <div class="flex justify-between items-center border-b border-brand-border pb-3 flex-wrap gap-2">
+                    <div>
+                        <span class="text-[10px] text-slate-500 font-bold block">RESERVATION REFERENCE ID</span>
+                        <span class="text-sm font-extrabold text-brand-accent">${bookingID}</span>
+                    </div>
+                    <span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] px-2.5 py-0.5 rounded font-black uppercase tracking-wider">Confirmed</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <span class="text-slate-450 block">Assigned Specialist:</span>
+                        <span class="font-extrabold text-white">${selectedDoctor.name}</span>
+                        <span class="text-[10px] text-brand-accent block">${selectedDoctor.specialty}</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-450 block">Patient Name:</span>
+                        <span class="font-extrabold text-white">${name}</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-450 block">Schedule Date:</span>
+                        <span class="font-extrabold text-white">${date}</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-450 block">Assigned Time Slot:</span>
+                        <span class="font-extrabold text-white">${time}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-brand-border pt-3 text-xs">
+                    <span class="text-slate-450 block">Consultation delivery format:</span>
+                    <span class="font-bold text-slate-200"><i class="fa-solid fa-circle-nodes text-brand-accent mr-1"></i> ${channel}</span>
+                </div>
+            `;
+
+            navigateTo('confirmation');
+        }
+
+        // RENDERING SYSTEM DASHBOARD
+        function renderAppointmentsDashboard() {
+            const tbody = document.getElementById('dashboard-appointments-tbody');
+            const emptyState = document.getElementById('dashboard-empty-state');
+            
+            tbody.innerHTML = '';
+
+            if (appointments.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            appointments.forEach(app => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-900 transition-colors";
+                row.innerHTML = `
+                    <td class="p-4 flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-brand-accent/10 border border-brand-accent/30 text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
+                            <i class="fa-solid ${app.doctor.img}"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-white block">${app.doctor.name}</span>
+                            <span class="text-[10px] text-slate-400 block">${app.doctor.specialty}</span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="text-slate-300 font-medium">${app.channel}</span>
+                    </td>
+                    <td class="p-4">
+                        <span class="font-bold text-white block">${app.date}</span>
+                        <span class="text-[10px] text-slate-450 block">${app.time}</span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider inline-block">Active</span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="cancelAppointment('${app.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Cancel Reservation</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // CANCEL AN APPOINTMENT
+        function cancelAppointment(id) {
+            if (confirm("Are you sure you want to cancel this mock reservation?")) {
+                appointments = appointments.filter(a => a.id !== id);
+                updateDashboardCounters();
+                renderAppointmentsDashboard();
+            }
+        }
+
+        // UPDATE SYSTEM COUNTERS
+        function updateDashboardCounters() {
+            document.getElementById('dashboard-total-appointments').innerText = `${appointments.length} Appointments`;
+            document.getElementById('dashboard-total-consultations').innerText = `${completedConsultCount} Runs`;
+        }
+    </script>
+</body>
+</html>
+```
